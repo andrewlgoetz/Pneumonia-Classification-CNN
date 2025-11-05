@@ -1,0 +1,4 @@
+what is a good baseline? a simple resnet, or performance of our dataseton on other models?
+
+TA Hamed:
+You can use whatever baseline was used in the associated paper, or train your own simple model 
