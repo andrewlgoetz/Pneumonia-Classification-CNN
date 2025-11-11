@@ -1,0 +1,18 @@
+{
+  "class_to_idx": {
+    "NORMAL": 0,
+    "PNEUMONIA": 1
+  },
+  "idx_to_class": {
+    "0": "NORMAL",
+    "1": "PNEUMONIA"
+  },
+  "train_counts": {
+    "0": 1214,
+    "1": 3494
+  },
+  "n_train": 4708,
+  "n_val": 524,
+  "n_test": 624,
+  "use_hist_equalize": false
+}
