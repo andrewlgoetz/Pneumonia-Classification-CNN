@@ -92,6 +92,8 @@ One of the most influential works in this area is CheXNet by Rajpurkar et al., w
 ** Insert Transfer Learning Study Here
 
 
+A contrasting line of work to the transfer-learning paradigm uses classical machine learning on hand-crafted features rather than deep CNNs. (Nagashree and Mahanand, 2023) present a system for pneumonia chest X-ray classification using a Support Vector Machine (SVM), targeting the same type of task as ours: distinguishing pneumonia from normal cases in chest radiographs. Instead of learning features end-to-end, they first extract Haar, shape, and texture descriptors from each X-ray and then train an SVM on these fixed feature vectors. Their study compares SVM performance against several other “shallow” classifiers (decision trees, naive Bayes, k-nearest neighbours) and reports that SVM achieves the best overall accuracy for pneumonia detection. This pipeline is an example of a non–transfer-learning approach: all discriminative information comes from manually engineered features, and no pretrained deep network or ImageNet-style initialization is used.
+
 \section{Dataset}
 
 % You should write about your dataset here, following the guidelines regarding item 1. This section may be 0.5-1 pages. Depending on your specific dataset, you may want to include subsections for the preprocessing, annotation, etc.
