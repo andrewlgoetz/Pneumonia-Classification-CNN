@@ -28,8 +28,8 @@
 \title{Group X Progress Report:\\My Group's Project Name}
 
 
-\author{First Author, Second Author, Third Author \\
-  \texttt{\{macid1,macid2,macid3\}@mcmaster.ca} }
+\author{Luna Aljammal, Second Author, Third Author \\
+  \texttt{\{aljammal,macid2,macid3\}@mcmaster.ca} }
 
 %\author{
 %  \textbf{First Author\textsuperscript{1}},
@@ -90,24 +90,32 @@ with pretrained models.
 
 % You should write about your dataset here, following the guidelines regarding item 1. This section may be 0.5-1 pages. Depending on your specific dataset, you may want to include subsections for the preprocessing, annotation, etc.
 
-We use the publicly available pediatric chest X-ray dataset sourced from Guangzhou Women and Children’s Medical Center \citep{kermany2018identifying}. This dataset contains X-ray images labeled as Normal, Viral Pneumonia, and Bacterial Pneumonia. 
-For our project, we focus on distinguishing Normal images from those showing Bacterial Pneumonia, making it a binary classification task.
+We use the publicly available pediatric chest X-ray dataset sourced from Guangzhou Women and Children’s Medical Center. This dataset contains over 5,800 frontal chest X-ray images of pediatric patients aged between 1 and 5 years. Images are categorized as Normal, Viral Pneumonia, or Bacterial Pneumonia. For our project, we focus on distinguishing Normal images from those showing Bacterial Pneumonia, making it a binary classification task aligned with clinical priorities.
 
-The dataset is split into training, validation, and test sets in proportions of 80\%, 10\%, and 10\% respectively. Stratified sampling was applied to ensure that each subset maintains the same class distribution as the overall dataset.
-Preprocessing involves resizing all images to a uniform dimension of \(224 \times 224\) pixels to match the input size requirements of our convolutional neural network. Pixel intensities are normalized according to ImageNet's channel mean and standard 
-deviation statistics to stabilize model training.
-To increase the diversity of training samples and reduce overfitting, we apply several data augmentation techniques. These include random resized cropping to simulate varying image scales, random horizontal flips to represent left-right invariance in X-rays, 
-slight random rotations to account for variance in patient positioning, and brightness jittering to mimic variations in imaging conditions.
-Additionally, we introduced an optional histogram equalization step prior to other augmentations. This step enhances image contrast, making critical features more prominent to the network during training.
+The dataset we received has already undergone thorough quality control and was expertly annotated by radiologists before release. Poor-quality scans or unreadable images were excluded, and all images bear reliable labels confirmed by multiple reviewers. This ensures that the dataset is well-suited for training without requiring additional manual cleanup from our side.
 
-This preprocessing strategy collectively improves the robustness and generalization capacity of the trained model.
+The data is split into training, validation, and test sets, comprising 80\%, 10\%, and 10\% of the dataset respectively. Stratified sampling maintains equal class distribution proportions across splits to prevent skewed training or evaluation.
+
+Each image is resized to a fixed \(160 \times 160\) pixel resolution. This size was chosen to balance model input requirements, computational efficiency, and sufficient preservation of pulmonary detail crucial for diagnosis. Pixel intensities are normalized using ImageNet channel mean and standard deviation statistics, a standard practice that promotes better convergence when fine-tuning pretrained convolutional neural networks.
+
+To increase training data diversity and reduce overfitting due to limited sample variety, we apply several augmentation techniques. These include random resized cropping to simulate scale variation, random horizontal flips to capture left-right anatomical invariance, slight random rotations to accommodate patient positioning variability, and brightness jittering to model differences in imaging conditions.
+
+Additionally, we introduced an optional histogram equalization step performed prior to other augmentations. This enhances the contrast of lung fields, potentially highlighting subtle features such as infiltrates or consolidations that aid model learning.
+
+
+Figure~\ref{fig:train-class-distribution} shows the class distribution in the training subset.
 \begin{figure}[h]
-    \centering
-    \includegraphics[width=0.7\linewidth]{DataDistribution.png}
-    \caption{Train class distribution for the effective data subset. The dataset is imbalanced, with the pneumonia class containing nearly three times as many examples as the normal class. This motivates our use of class weights during model training.}
-    \label{fig:train-class-distribution}
+    \centering
+    \includegraphics[width=0.7\linewidth]{DataDistribution.png}
+    \caption{Class distribution in the training set.}
+    \label{fig:train-class-distribution}
 \end{figure}
-As shown in Figure 1, our training set has a noticeable class imbalance, with the pneumonia class being significantly more common than the normal class. This imbalance was addressed by applying class weighting in the loss function.
+Pneumonia cases are approximately three times more frequent than normal cases. To mitigate training bias from this class imbalance, we employ class weighting in the loss function, encouraging the model to learn balanced representations for both classes.
+
+
+Together, these dataset preparation strategies provide a solid and clinically relevant foundation for building an automated pediatric pneumonia diagnosis system.
+
+
 
 \section{Features}
 
