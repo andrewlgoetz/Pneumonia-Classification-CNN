@@ -17,6 +17,7 @@
 \usepackage{microtype}
 \usepackage{inconsolata}
 \usepackage{graphicx}
+\graphicspath{{Figures/}}
 
 % If the title and author information does not fit in the area allocated, uncomment the following
 %
@@ -99,6 +100,13 @@ slight random rotations to account for variance in patient positioning, and brig
 Additionally, we introduced an optional histogram equalization step prior to other augmentations. This step enhances image contrast, making critical features more prominent to the network during training.
 
 This preprocessing strategy collectively improves the robustness and generalization capacity of the trained model.
+\begin{figure}[h]
+    \centering
+    \includegraphics[width=0.7\linewidth]{DataDistribution.png}
+    \caption{Train class distribution for the effective data subset. The dataset is imbalanced, with the pneumonia class containing nearly three times as many examples as the normal class. This motivates our use of class weights during model training.}
+    \label{fig:train-class-distribution}
+\end{figure}
+As shown in Figure~\ref{fig:train-class-distribution}, our training set has a noticeable class imbalance, with the pneumonia class being significantly more common than the normal class. This imbalance was addressed by applying class weighting in the loss function.
 
 \section{Features}
 
