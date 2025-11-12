@@ -153,18 +153,13 @@ Future milestones include implementing k-fold cross-validation for more reliable
 Write about your plans for the remainder of the project. This should include a discussion of the feedback you received from your TA, and how you plan to improve your approach. Reflect on your implementation and areas for improvement. Refer to item 6. This may be around 0.5 pages.
 
 \section{TA Feedback and Reflection}
+The primary feedback from our TA emphasized the importance of using a simple baseline for comparison, specifically the majority-class classifier. This baseline predicts the most frequent class in the training data and establishes a clear performance threshold that the CNN model should surpass. Including such a baseline is essential for contextualizing model results and avoiding overstated performance claims.
 
-The primary feedback received from our TA focused on the importance of using a simple baseline for comparison, specifically the majority-class classifier. This baseline predicts the most frequent class in the training data and provides a clear performance threshold that the CNN model 
-should surpass. The TA emphasized that including such a baseline is critical for contextualizing model results and preventing inflated claims of performance.
+Reflecting on this advice, we integrated the majority baseline into our evaluation framework and confirmed that our CNN model consistently outperforms it across key metrics. This strengthens confidence in the effectiveness of our transfer learning approach for pneumonia detection.
 
-Reflecting on this advice, we have integrated the majority baseline into our evaluation framework and confirmed that our CNN model significantly outperforms it in all key metrics, including accuracy, recall, and F1-score. This comparison strengthens confidence in the effectiveness of 
-our transfer learning approach for pneumonia detection.
+The TA also recommended focusing on binary classification between Normal and Bacterial Pneumonia instead of including Viral Pneumonia. This simplifies the task and keeps the project scope focused. All data preparation and model design follow this two-class goal, with the majority baseline serving as a clear reference point. A multiclass version may be explored later as an extension to this project.
 
-Moving forward, we plan to maintain the majority baseline alongside more advanced evaluation methods such as cross-validation to provide thorough and transparent performance assessments. We will also continue refining our model and preprocessing pipeline, informed by this fundamental 
-baseline standard to ensure genuine improvements.
-
-This guidance from the TA has been valuable in emphasizing rigorous benchmarking and comparative evaluation, which will be central to our approach in the upcoming milestones.
-
+Overall, the TA’s guidance reinforced the importance of rigorous benchmarking and comparative evaluation, which will remain central to our approach in future milestones.
 \section{Template Notes}
 
 % You can remove this section or comment it out, as it only contains instructions for how to use this template. You may use subsections in your document as you find appropriate.
