@@ -122,7 +122,8 @@ Figure~\ref{fig:train-class-distribution} shows the class distribution in the tr
     \caption{Class distribution in the training set.}
     \label{fig:train-class-distribution}
 \end{figure}
-Pneumonia cases are approximately three times more frequent than normal cases. To mitigate training bias from this class imbalance, we employ class weighting in the loss function, encouraging the model to learn balanced representations for both classes.
+Pneumonia cases are approximately three times more frequent than normal cases. To mitigate training bias from this class imbalance, we employ class weighting in the loss function, encouraging the model to learn balanced representations for both classes. The patients' have their personal information removed for the purposes of maintaining their privacy. The Operationalization of medical diagnoses is simple because the problem is very objective and requires the use of Experts to do the labeling. 
+
 
 Together, these dataset preparation strategies provide a solid and clinically relevant foundation for building an automated pediatric pneumonia diagnosis system.
 
@@ -162,14 +163,25 @@ The modular design of the implementation facilitates easy extension with alterna
 
 % How are you evaluating your model? What results do you have so far? What are your baselines? Refer to item 5. This may take around 0.5 pages.
 
-We evaluate our model using stratified training, validation, and test splits. The validation set guides hyperparameter tuning and early stopping, while the test set provides an unbiased assessment of final model performance.
+We evaluate our model using stratified training, validation, and test splits.The validation set is used for hyperparameter tuning and early stopping, while the test set provides an unbiased estimate of final model performance.
 
-Our evaluation metrics include accuracy, precision, recall (sensitivity), F1-score, and ROC-AUC. Accuracy measures the overall correct predictions; precision and recall focus on positive (pneumonia) detection performance, which is critical in a medical context to minimize missed diagnoses. 
+Our evaluation metrics include accuracy, precision, recall, F1-score, and ROC-AUC. Accuracy measures the overall correct predictions; precision and recall focus on positive (pneumonia) detection performance, which is critical in a medical context to minimize missed diagnoses. 
 The F1-score balances precision and recall, and the ROC-AUC quantifies the model’s discrimination ability across thresholds.
 
 The baseline model used for comparison is a majority-class classifier that predicts the most frequent class in the training data.
 
-From our results, the CNN model substantially outperforms the baseline across all metrics. Specifically, the validation F1-score improved from approximately 0.55 (baseline) to over 0.85 with the CNN. Recall increased notably, signaling fewer missed pneumonia cases. 
+We also compare against a majority-class baseline and visualize performance using a confusion matrix. The CNN substantially outperforms the baseline across all metrics, with F1-score improving from ~0.55 to >0.85 and recall notably higher, indicating fewer missed pneumonia cases.
+
+We plan to incorporate k-fold cross-validation in future work for more robust performance estimates.
+\begin{figure}[h]
+    \centering
+    \includegraphics[width=0.7\linewidth]{ConfusionMatrix.png}
+    \caption{Confusion matrix showing model performance on the test set.}
+    \label{fig:confusion-matrix}
+\end{figure}
+
+
+Specifically, the validation F1-score improved from approximately 0.55 (baseline) to over 0.85 with the CNN. Recall increased notably, signaling fewer missed pneumonia cases. 
 Confusion matrices further confirm enhanced true positive detection while controlling false positives.
 These preliminary results demonstrate that fine-tuning the pretrained ResNet18 with our preprocessing and augmentation pipeline yields a robust pneumonia classifier with strong generalization to unseen data.
 Future milestones include implementing k-fold cross-validation for more reliable estimates and further interpreting misclassification patterns to refine the model.
@@ -177,7 +189,7 @@ Future milestones include implementing k-fold cross-validation for more reliable
 
 
 
-Write about your plans for the remainder of the project. This should include a discussion of the feedback you received from your TA, and how you plan to improve your approach. Reflect on your implementation and areas for improvement. Refer to item 6. This may be around 0.5 pages.
+% Write about your plans for the remainder of the project. This should include a discussion of the feedback you received from your TA, and how you plan to improve your approach. Reflect on your implementation and areas for improvement. Refer to item 6. This may be around 0.5 pages.
 
 \section{TA Feedback and Reflection}
 The primary feedback from our TA emphasized the importance of using a simple baseline for comparison, specifically the majority-class classifier. This baseline predicts the most frequent class in the training data and establishes a clear performance threshold that the CNN model should surpass. Including such a baseline is essential for contextualizing model results and avoiding overstated performance claims.
