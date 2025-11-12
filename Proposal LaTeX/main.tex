@@ -112,7 +112,6 @@ Figure~\ref{fig:train-class-distribution} shows the class distribution in the tr
 \end{figure}
 Pneumonia cases are approximately three times more frequent than normal cases. To mitigate training bias from this class imbalance, we employ class weighting in the loss function, encouraging the model to learn balanced representations for both classes.
 
-
 Together, these dataset preparation strategies provide a solid and clinically relevant foundation for building an automated pediatric pneumonia diagnosis system.
 
 
@@ -129,17 +128,24 @@ applied data augmentations. The representations are learned end-to-end, enabling
 
 % Describe your model and implementation here. Refer to item 4. This may take around a page.
 
-The model uses a ResNet18 convolutional neural network pretrained on ImageNet. We start by freezing all the layers of the pretrained network except the last fully connected layer, which we replace to adapt the model for the binary pneumonia classification task. In this initial 
-phase, we train only the new classification layer, allowing the network to learn how to map extracted features to our target labels while keeping the underlying feature extraction stable.
-Once the classifier head reaches a satisfactory performance, we unfreeze the last convolutional block to fine-tune deeper layers. This allows the network to adjust more specialized features relevant to pediatric chest X-rays and pneumonia detection. The fine-tuning uses a lower 
-learning rate to ensure stable training without overwriting useful pretrained features.
-We employ weighted cross-entropy loss during training to mitigate class imbalance by giving more importance to the minority pneumonia class. The Adam optimizer is used with weight decay regularization to help prevent overfitting by penalizing large parameter values. Additionally, 
-we employ early stopping based on validation F1-score, which halts training when no improvement is observed for a set number of epochs, saving the best model weights.
-For baseline comparison, we implement a simple majority-class classifier that always predicts the most frequent class in the training set. This baseline provides a minimal performance benchmark that our model should outperform.
-During training, we incorporate data augmentation and preprocessing to enhance model robustness. We encountered typical challenges such as tuning the balance between frozen and unfrozen layers and setting appropriate learning rates. These were addressed through iterative experimentation, 
-monitoring training and validation metrics to guide hyperparameter selection.
-The implementation is modular to allow for easy experimentation with other models, loss functions, or augmentation strategies in the future. So far, the approach demonstrates an effective transfer learning strategy well-suited for medical image classification tasks like pneumonia detection.
 
+The model uses a ResNet18 convolutional neural network pretrained on ImageNet. Initially, we freeze all pretrained layers except the final fully connected layer, which is replaced to suit our binary pneumonia classification task. In this stage, only the classification head is trained, enabling the network to learn the mapping from extracted features to target labels while keeping the general feature extractor unchanged.
+Once the classification head achieves satisfactory performance, we unfreeze the last convolutional block to fine-tune deeper layers. This process allows the network to adapt more task-specific features relevant to pediatric chest X-rays and pneumonia detection. We apply a reduced learning rate during fine-tuning to stabilize training and preserve useful pretrained representations.
+
+To address class imbalance in the dataset, we use a weighted cross-entropy loss, formulated as:
+
+\begin{equation}
+\mathcal{L} = - \sum_{i=1}^N w_{y_i} \log p(y_i \mid \mathbf{x}_i)
+\label{eq:weighted_cross_entropy}
+\end{equation}
+
+Here, \(N\) is the number of samples, \(y_i\) is the true label of sample \(i\), \(w_{y_i}\) is the corresponding class weight compensating for imbalance, and \(p(y_i \mid \mathbf{x}_i)\) is the predicted probability for the correct class given input \(\mathbf{x}_i\).
+
+Training is performed using the Adam optimizer with weight decay to regularize model parameters and reduce overfitting. We utilize early stopping based on the validation F1-score to halt training when improvements plateau, ensuring the preservation of the best model weights.
+For baseline comparison, a simple majority-class classifier is implemented, which always predicts the most frequent class in the training set. This baseline sets a minimal performance bar that our trained model is expected to exceed.
+Data augmentation and preprocessing during training contribute to model robustness. Challenges encountered include tuning when to freeze or unfreeze layers and selecting appropriate learning rates, addressed through iterative experimentation guided by validation metrics.
+
+The modular design of the implementation facilitates easy extension with alternative models, loss functions, or augmentation methods in future work. Overall, this transfer learning approach provides a strong framework for pediatric pneumonia classification with promising initial results.
 \section{Results and Evaluation}
 
 % How are you evaluating your model? What results do you have so far? What are your baselines? Refer to item 5. This may take around 0.5 pages.
