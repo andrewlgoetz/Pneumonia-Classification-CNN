@@ -28,8 +28,8 @@
 \title{Group 54 Progress Report:\\X-Ray Vision}
 
 
-\author{Luna Aljammal, Second Author, Third Author \\
-  \texttt{\{aljammal,macid2,macid3\}@mcmaster.ca} }
+\author{Luna Aljammal, Andrew Goetz, Djordje Kokot \\
+  \texttt{\{aljammal,goetz3,kokotd\}@mcmaster.ca} }
 
 %\author{
 %  \textbf{First Author\textsuperscript{1}},
@@ -80,19 +80,23 @@
 Pneumonia is a severe respiratory infection causing significant morbidity and mortality worldwide, especially in young children. Accurate and timely diagnosis is crucial for effective treatment and 
 improving outcomes. Traditionally, diagnosis relies on expert radiologists interpreting chest X-rays, but deep learning-based automated detection systems offer potential for faster and scalable assessment. 
 Our project aims to develop a binary classification model that distinguishes between normal and bacterial pneumonia pediatric chest X-ray images using convolutional neural networks (CNNs) and transfer learning 
-with pretrained models. Previous work done on a similar task by \[x\] has shown the effectiveness of both Convolutional Neural Networks and transfer learning in the domain medical image classification managing to achieve accuracies of >90\% on multi-label classification problems using Optical Coherence Tomography Images with Choroidal Neovascularization(CNV)/Drusen/Diabetic Macular Edema(DME); and Chest X-Rays with either Viral/Bacterial Pneumonia.  According to  [x] transfer learning is a great tool for domains when only limited data is available, a major issue faced in using these models is that they are quite large compared to the dataset and when fine tuning deeper layers they can easily overfit to the training set. 
+with pretrained weights. 
+
+
 
 \section{Related Work}
 
 % Here, talk about the related work you encountered for your approach. Cite at least 5 references. Refer to item 2. No one has done exactly your task? Write about the most similar thing you can find. This should be around 0.25-0.5 pages.
 
-One of the most influential works in this area is CheXNet by Rajpurkar et al., who trained a 121-layer DenseNet on a much larger dataset "NIH ChestX-ray14 dataset" (over 100,000 adult radiographs with 14 labels) and showed that their model could detect pneumonia at or above average radiologist performance on a held-out test set (for certain pathologies). They later extended this approach to CheXNeXt, a multi-label model that jointly predicts multiple thoracic pathologies from a single chest X-ray (Rajpurkar, 2018). These works popularized the use of deep, pretrained CNNs and transfer learning on large CXR datasets. We drew insipiration from this paradigmin our own model.
+One of the most influential works in this area is CheXNet by Rajpurkar et al., who trained a 121-layer DenseNet on a much larger dataset "NIH ChestX-ray14 dataset" (over 100,000 adult radiographs with 14 labels) and showed that their model could detect pneumonia at or above average radiologist performance on a held-out test set (for certain pathologies). They later extended this approach to CheXNeXt, a multi-label model that jointly predicts multiple thoracic pathologies from a single chest X-ray (Rajpurkar, 2018). These works popularized the use of deep, CNNs on large CXR datasets. We drew insipiration from this paradigmin our own model.
 
 
-** Insert Transfer Learning Study Here
+Previous work done on a similar task by \[x\] has shown the effectiveness of both Convolutional Neural Networks and transfer learning in the domain medical image classification managing to achieve accuracies of >90\% on multi-label classification problems using Optical Coherence Tomography Images with Choroidal Neovascularization(CNV)/Drusen/Diabetic Macular Edema(DME); and Chest X-Rays with either Viral/Bacterial Pneumonia.  According to  \[x\] transfer learning is a great tool for domains when only limited data is available, a major issue faced in using these models is that they are quite large compared to the dataset and when fine tuning deeper layers they can easily overfit to the training set. 
 
 
-A contrasting line of work to the transfer-learning paradigm uses classical machine learning on hand-crafted features rather than deep CNNs. (Nagashree and Mahanand, 2023) present a system for pneumonia chest X-ray classification using a Support Vector Machine (SVM), targeting the same type of task as ours: distinguishing pneumonia from normal cases in chest radiographs. Instead of learning features end-to-end, they first extract Haar, shape, and texture descriptors from each X-ray and then train an SVM on these fixed feature vectors. Their study compares SVM performance against several other “shallow” classifiers (decision trees, naive Bayes, k-nearest neighbours) and reports that SVM achieves the best overall accuracy for pneumonia detection. This pipeline is an example of a non–transfer-learning approach: all discriminative information comes from manually engineered features, and no pretrained deep network or ImageNet-style initialization is used.
+A contrasting line of work to the transfer-learning paradigm uses classical machine learning on hand-crafted features rather than deep CNNs. (Nagashree and Mahanand, 2023) present a system for pneumonia chest X-ray classification using a Support Vector Machine (SVM), targeting the same type of task as ours: distinguishing pneumonia from normal cases in chest radiographs. Instead of learning features from scratch, they first extract Haar, shape, and texture descriptors from each X-ray and then train an SVM on these fixed feature vectors. Their study compares SVM performance against several other classifiers (decision trees, naive Bayes, k-nearest neighbours) and reports that SVM achieves the best overall accuracy for pneumonia detection. This pipeline is an example of a non–transfer-learning approach: all discriminative information comes from manually engineered features, and no pretrained deep network or ImageNet-style initialization is used.
+
+Another strand of work in medical image classification explicitly tries to go beyond the standard of transfer learning. (Hosny, 2025) proposed an attention-enhanced deep learning framework for multiclass gastrointestinal (GI) disease classification that they explicitly frame as “beyond transfer learning”. They argue that many existing GI pipelines rely on standard transfer learning with pretrained CNNs either as standalone classifiers, as components in ensembles, or as frozen feature extractors feeding shallow classifiers. They claim that these pipelines can be overly generic, computationally heavy, and perhaps not ideal for clinical settings. They propose a novel end-to-end DL model for multiclass GI disease classification called IRA-DenseNet201. They still start from a pretrained DenseNet201, but instead of just using a new layer on top, they wrap it in extra blocks (Inception, residual, attention, etc.). THese extra layers are designed specifically for GI disease images. In other words, they use transfer learning, but then customize and extend the backbone so the whole network is more specialized for their medical task. This is not directly related to our work as it is a different disease being classified but it does propose a valuable insight and potential strategy into how we can impove our work.
 
 \section{Dataset}
 
@@ -184,9 +188,16 @@ The TA also recommended focusing on binary classification between Normal and Bac
 
 In addition, the TA, mentioned that we could attempt to use multiple models (ie in a strategy similar to transfer learning), to use CNN features with an SVM which is a useful consideration we can make as we move forward
 
-Overall, the TA’s guidance reinforced the importance of rigorous benchmarking and comparative evaluation, which will remain central to our approach in future milestones.
+Overall, the TA’s guidance reinforced the importance of rigorous benchmarking and comparative evaluation, which will remain central to our approach in future milestones.The guidance also helps us view transfer learning as simply one component of a larger paradigm. Based on the TA's feedback we will continue to experiment with different methods and small tweaks. Transfer learning is just one small part of our pipeline, and we are planning on exploring additional ways of differentiating our model as well.
 
-Our Plans moving forward are centered mostly around expanding on the strategies we've utilized so far to differentiate our implementation.
+One area where we faced issues was with training on our local machine and subsequently had to switch to cloud. This was an reminder that going forward we may need to consider model complexity and training time, at least to some extent.
+
+Our implementation so far has highlighted several areas for improvement. First, the initial ResNet-18 transfer-learning model (with only the final layer trained) shows signs of overfitting, with training loss decreasing while validation loss and F1 sometimes degrade. This indicates that for the remaining weeks we need to experiment more with stronger regularization, data augmentation, and hyperparameter tuning.
+
+We plan on extending our model both with and without transfer learning (using pre-trained weights). We will continue to experiment with transfer learning by adding a tuning phase where the last ResNet block is unfrozen and trained with a small learning rate, to attempt a deeper adaptation to our data. As previously mentioned, based on feedback we may also introduced our own models for learning features or introduce new models that make use of the wights learned by our existing model.
+
+
+
 \section{Template Notes}
 
 % You can remove this section or comment it out, as it only contains instructions for how to use this template. You may use subsections in your document as you find appropriate.
