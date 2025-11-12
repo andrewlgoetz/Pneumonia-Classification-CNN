@@ -86,6 +86,12 @@ with pretrained models.
 
 % Here, talk about the related work you encountered for your approach. Cite at least 5 references. Refer to item 2. No one has done exactly your task? Write about the most similar thing you can find. This should be around 0.25-0.5 pages.
 
+One of the most influential works in this area is CheXNet by Rajpurkar et al., who trained a 121-layer DenseNet on a much larger dataset "NIH ChestX-ray14 dataset" (over 100,000 adult radiographs with 14 labels) and showed that their model could detect pneumonia at or above average radiologist performance on a held-out test set (for certain pathologies). They later extended this approach to CheXNeXt, a multi-label model that jointly predicts multiple thoracic pathologies from a single chest X-ray (Rajpurkar, 2018). These works popularized the use of deep, pretrained CNNs and transfer learning on large CXR datasets. We drew insipiration from this paradigmin our own model.
+
+
+
+
+
 \section{Dataset}
 
 % You should write about your dataset here, following the guidelines regarding item 1. This section may be 0.5-1 pages. Depending on your specific dataset, you may want to include subsections for the preprocessing, annotation, etc.
@@ -160,7 +166,11 @@ Reflecting on this advice, we integrated the majority baseline into our evaluati
 
 The TA also recommended focusing on binary classification between Normal and Bacterial Pneumonia instead of including Viral Pneumonia. This simplifies the task and keeps the project scope focused. All data preparation and model design follow this two-class goal, with the majority baseline serving as a clear reference point. A multiclass version may be explored later as an extension to this project.
 
+In addition, the TA, mentioned that we could attempt to use multiple models (ie in a strategy similar to transfer learning), to use CNN features with an SVM which is a useful consideration we can make as we move forward
+
 Overall, the TA’s guidance reinforced the importance of rigorous benchmarking and comparative evaluation, which will remain central to our approach in future milestones.
+
+Our Plans moving forward are centered mostly around expanding on the strategies we've utilized so far to differentiate our implementation.
 \section{Template Notes}
 
 % You can remove this section or comment it out, as it only contains instructions for how to use this template. You may use subsections in your document as you find appropriate.
