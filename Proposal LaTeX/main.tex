@@ -91,7 +91,7 @@ with pretrained weights.
 One of the most influential works in this area is CheXNet by Rajpurkar et al., who trained a 121-layer DenseNet on a much larger dataset "NIH ChestX-ray14 dataset" (over 100,000 adult radiographs with 14 labels) and showed that their model could detect pneumonia at or above average radiologist performance on a held-out test set (for certain pathologies). They later extended this approach to CheXNeXt, a multi-label model that jointly predicts multiple thoracic pathologies from a single chest X-ray (Rajpurkar, 2018). These works popularized the use of deep, CNNs on large CXR datasets. We drew insipiration from this paradigmin our own model.
 
 
-Previous work done on a similar task by \[x\] has shown the effectiveness of both Convolutional Neural Networks and transfer learning in the domain medical image classification managing to achieve accuracies of >90\% on multi-label classification problems using Optical Coherence Tomography Images with Choroidal Neovascularization(CNV)/Drusen/Diabetic Macular Edema(DME); and Chest X-Rays with either Viral/Bacterial Pneumonia.  According to  \[x\] transfer learning is a great tool for domains when only limited data is available, a major issue faced in using these models is that they are quite large compared to the dataset and when fine tuning deeper layers they can easily overfit to the training set. 
+Previous work done on a similar task by (Kermany, 2018) has shown the effectiveness of both Convolutional Neural Networks and transfer learning in the domain medical image classification managing to achieve accuracies of >90\% on multi-label classification problems using Optical Coherence Tomography Images with Choroidal Neovascularization(CNV)/Drusen/Diabetic Macular Edema(DME); and Chest X-Rays with either Viral/Bacterial Pneumonia.  According to (Chouhan, 2020) transfer learning is a great tool for domains when only limited data is available, a major issue faced in using these models is that they are quite large compared to the dataset and when fine tuning deeper layers they can easily overfit to the training set. 
 
 
 A contrasting line of work to the transfer-learning paradigm uses classical machine learning on hand-crafted features rather than deep CNNs. (Nagashree and Mahanand, 2023) present a system for pneumonia chest X-ray classification using a Support Vector Machine (SVM), targeting the same type of task as ours: distinguishing pneumonia from normal cases in chest radiographs. Instead of learning features from scratch, they first extract Haar, shape, and texture descriptors from each X-ray and then train an SVM on these fixed feature vectors. Their study compares SVM performance against several other classifiers (decision trees, naive Bayes, k-nearest neighbours) and reports that SVM achieves the best overall accuracy for pneumonia detection. This pipeline is an example of a non–transfer-learning approach: all discriminative information comes from manually engineered features, and no pretrained deep network or ImageNet-style initialization is used.
@@ -118,7 +118,7 @@ Additionally, we introduced an optional histogram equalization step performed pr
 Figure~\ref{fig:train-class-distribution} shows the class distribution in the training subset.
 \begin{figure}[h]
     \centering
-    \includegraphics[width=0.7\linewidth]{DataDistribution.png}
+    \includegraphics[width=0.8\linewidth]{DataDistribution.png}
     \caption{Class distribution in the training set.}
     \label{fig:train-class-distribution}
 \end{figure}
@@ -212,59 +212,59 @@ Since transfer learning relies on the pretrained weights of a generalized model 
 
 
 
-\section{Template Notes}
+% \section{Template Notes}
 
 % You can remove this section or comment it out, as it only contains instructions for how to use this template. You may use subsections in your document as you find appropriate.
 
-\subsection{Tables and figures}
+% \subsection{Tables and figures}
 
-See Table~\ref{citation-guide} for an example of a table and its caption.
-See Figure~\ref{fig:experiments} for an example of a figure and its caption.
+% See Table~\ref{citation-guide} for an example of a table and its caption.
+% See Figure~\ref{fig:experiments} for an example of a figure and its caption.
 
-\subsection{Citations}
+% \subsection{Citations}
 
-\begin{table*}
-  \centering
-  \begin{tabular}{lll}
-    \hline
-    \textbf{Output}           & \textbf{natbib command} & \textbf{ACL only command} \\
-    \hline
-    \citep{Gusfield:97}       & \verb|\citep|           &                           \\
-    \citealp{Gusfield:97}     & \verb|\citealp|         &                           \\
-    \citet{Gusfield:97}       & \verb|\citet|           &                           \\
-    \citeyearpar{Gusfield:97} & \verb|\citeyearpar|     &                           \\
-    \citeposs{Gusfield:97}    &                         & \verb|\citeposs|          \\
-    \hline
-  \end{tabular}
-  \caption{\label{citation-guide}
-    Citation commands supported by the style file.
-  }
-\end{table*}
+% \begin{table*}
+%   \centering
+%   \begin{tabular}{lll}
+%     \hline
+%     \textbf{Output}           & \textbf{natbib command} & \textbf{ACL only command} \\
+%     \hline
+%     \citep{Gusfield:97}       & \verb|\citep|           &                           \\
+%     \citealp{Gusfield:97}     & \verb|\citealp|         &                           \\
+%     \citet{Gusfield:97}       & \verb|\citet|           &                           \\
+%     \citeyearpar{Gusfield:97} & \verb|\citeyearpar|     &                           \\
+%     \citeposs{Gusfield:97}    &                         & \verb|\citeposs|          \\
+%     \hline
+%   \end{tabular}
+%   \caption{\label{citation-guide}
+%     Citation commands supported by the style file.
+%   }
+% \end{table*}
 
-Table~\ref{citation-guide} shows the syntax supported by the style files.
-We encourage you to use the natbib styles.
-You can use the command \verb|\citet| (cite in text) to get ``author (year)'' citations, like this citation to a paper by \citet{Gusfield:97}.
-You can use the command \verb|\citep| (cite in parentheses) to get ``(author, year)'' citations \citep{Gusfield:97}.
-You can use the command \verb|\citealp| (alternative cite without parentheses) to get ``author, year'' citations, which is useful for using citations within parentheses (e.g. \citealp{Gusfield:97}).
+% Table~\ref{citation-guide} shows the syntax supported by the style files.
+% We encourage you to use the natbib styles.
+% You can use the command \verb|\citet| (cite in text) to get ``author (year)'' citations, like this citation to a paper by \citet{Gusfield:97}.
+% You can use the command \verb|\citep| (cite in parentheses) to get ``(author, year)'' citations \citep{Gusfield:97}.
+% You can use the command \verb|\citealp| (alternative cite without parentheses) to get ``author, year'' citations, which is useful for using citations within parentheses (e.g. \citealp{Gusfield:97}).
 
-\subsection{References}
 
-\nocite{Ando2005,andrew2007scalable,rasooli-tetrault-2015}
 
-Many websites where you can find academic papers also allow you to export a bib file for citation or bib formatted entry. Copy this into the \texttt{custom.bib} and you will be able to cite the paper in the \LaTeX{}. You can remove the example entries.
+% \nocite{Ando2005,andrew2007scalable,rasooli-tetrault-2015}
 
-\subsection{Equations}
+% Many websites where you can find academic papers also allow you to export a bib file for citation or bib formatted entry. Copy this into the \texttt{custom.bib} and you will be able to cite the paper in the \LaTeX{}. You can remove the example entries.
 
-An example equation is shown below:
-\begin{equation}
-  \label{eq:example}
-  A = \pi r^2
-\end{equation}
+% \subsection{Equations}
 
-Labels for equation numbers, sections, subsections, figures and tables
-are all defined with the \verb|\label{label}| command and cross references
-to them are made with the \verb|\ref{label}| command.
-This an example cross-reference to Equation~\ref{eq:example}. You can also write equations inline, like this: $A=\pi r^2$.
+% An example equation is shown below:
+% \begin{equation}
+%   \label{eq:example}
+%   A = \pi r^2
+% \end{equation}
+
+% Labels for equation numbers, sections, subsections, figures and tables
+% are all defined with the \verb|\label{label}| command and cross references
+% to them are made with the \verb|\ref{label}| command.
+% This an example cross-reference to Equation~\ref{eq:example}. You can also write equations inline, like this: $A=\pi r^2$.
 
 
 % \section*{Limitations}
@@ -277,7 +277,7 @@ Luna worked on data preprocessing and augmentation, addressing class imbalance. 
 %\bibliography{custom,anthology-overleaf-1,anthology-overleaf-2}
 
 % Custom bibliography entries only
-\bibliography{custom}
+% \bibliography{custom}
 
 % \appendix
 
@@ -285,5 +285,49 @@ Luna worked on data preprocessing and augmentation, addressing class imbalance. 
 % \label{sec:appendix}
 
 % This is an appendix.
+
+\pagebreak
+\begin{thebibliography}{9}  % {9} sets label width; any small number is fine
+
+\bibitem[Rajpurkar(2018)]{Rajpurkar2018}
+Pranav Rajpurkar et al.
+\newblock Alternation.
+\newblock \emph{Journal of the Association for Computing Machinery}, 15(11):e1002686, 2018.
+\newblock doi:10.1371/journal.pmed.1002686.
+
+\bibitem[Kermany(2018)]{Kermany2018Dataset}
+Daniel Kermany et al.
+\newblock Large Dataset of Labeled Optical Coherence Tomography (OCT) and Chest X-Ray Images.
+\newblock \emph{Mendeley Data, V3}, 2018.
+\newblock doi:10.17632/rscbjbr9sj.3.
+\newblock Available at: \url{https://doi.org/10.17632/rscbjbr9sj.3}.
+
+\bibitem[Chouhan(2020)]{Chouhan2020}
+Vikash Chouhan et al.
+\newblock A Novel Transfer Learning Based Approach for Pneumonia Detection in Chest X-ray Images.
+\newblock \emph{Applied Sciences}, 10(2):559, 2020.
+\newblock doi:10.3390/app10020559.
+
+\bibitem[Kermany(2018)]{Kermany2018}
+Daniel S. Kermany et al.
+\newblock Identifying Medical Diagnoses and Treatable Diseases by Image-Based Deep Learning.
+\newblock \emph{Cell}, 172(5):1122--1131.e9, 2018.
+\newblock doi:10.1016/j.cell.2018.02.010.
+
+\bibitem[Nagashree and Mahanand(2023)]{NagashreeMahanand2023}
+Nagashree, S. and Mahanand, B.S.
+\newblock Pneumonia Chest X-ray Classification Using Support Vector Machine.
+\newblock In \emph{Proceedings of International Conference on Data Science and Applications},
+Lecture Notes in Networks and Systems, vol. 552, pp. 417--425. Springer, Singapore, 2023.
+\newblock doi:10.1007/978-981-19-6634-7\_29.
+
+\bibitem[Hosny(2025)]{Hosny2025}
+Hosny, M. et al.
+\newblock Beyond transfer learning: Attention-enhanced deep … 
+\newblock \emph{Expert Systems with Applications}, 2025. In press / online first.
+\newblock doi:10.1016/S0957-4174(25)024698.
+
+\end{thebibliography}
+
 
 \end{document}
