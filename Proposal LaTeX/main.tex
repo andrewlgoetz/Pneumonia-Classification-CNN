@@ -159,16 +159,16 @@ The modular design of the implementation facilitates easy extension with alterna
 
 % How are you evaluating your model? What results do you have so far? What are your baselines? Refer to item 5. This may take around 0.5 pages.
 
-We evaluate our model using stratified training, validation, and test splits. The validation set guides hyperparameter tuning and early stopping, while the test set provides an unbiased assessment of final model performance.
+We evaluate our model using stratified training, validation, and test splits.The validation set is used for hyperparameter tuning and early stopping, while the test set provides an unbiased estimate of final model performance.
 
-Our evaluation metrics include accuracy, precision, recall (sensitivity), F1-score, and ROC-AUC. Accuracy measures the overall correct predictions; precision and recall focus on positive (pneumonia) detection performance, which is critical in a medical context to minimize missed diagnoses. 
+Our evaluation metrics include accuracy, precision, recall, F1-score, and ROC-AUC. Accuracy measures the overall correct predictions; precision and recall focus on positive (pneumonia) detection performance, which is critical in a medical context to minimize missed diagnoses. 
 The F1-score balances precision and recall, and the ROC-AUC quantifies the model’s discrimination ability across thresholds.
 
 The baseline model used for comparison is a majority-class classifier that predicts the most frequent class in the training data.
 
-From our results, the CNN model substantially outperforms the baseline across all metrics.
-To further visualize model performance, we plot the confusion matrix for the test set, highlighting how well the classifier distinguishes between Normal and Bacterial Pneumonia cases (Figure~\ref{fig:confusion-matrix}).
+We also compare against a majority-class baseline and visualize performance using a confusion matrix. The CNN substantially outperforms the baseline across all metrics, with F1-score improving from ~0.55 to >0.85 and recall notably higher, indicating fewer missed pneumonia cases.
 
+We plan to incorporate k-fold cross-validation in future work for more robust performance estimates.
 \begin{figure}[h]
     \centering
     \includegraphics[width=0.7\linewidth]{ConfusionMatrix.png}
