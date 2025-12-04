@@ -1,0 +1,391 @@
+\documentclass[11pt]{article}
+
+% Change "review" to "final" to generate the final (sometimes called camera-ready) version.
+% Change to "preprint" to generate a non-anonymous version with page numbers.
+\usepackage[]{acl}
+\usepackage{./acl}
+
+\usepackage{times}
+\usepackage{latexsym}
+
+% For proper rendering and hyphenation of words containing Latin characters (including in bib files)
+\usepackage[T1]{fontenc}
+% For Vietnamese characters
+% \usepackage[T5]{fontenc}
+% See https://www.latex-project.org/help/documentation/encguide.pdf for other character sets
+
+% This assumes your files are encoded as UTF8
+\usepackage[utf8]{inputenc}
+\usepackage{microtype}
+\usepackage{inconsolata}
+\usepackage{graphicx}
+\graphicspath{{Figures/}}
+
+% If the title and author information does not fit in the area allocated, uncomment the following
+%
+%\setlength\titlebox{<dim>}
+%
+% and set <dim> to something 5cm or larger.
+
+\title{Group 54 Final Report:\\X-Ray Vision}
+
+
+\author{Luna Aljammal, Andrew Goetz, Djordje Kokot \\
+  \texttt{\{aljammal,goetz3,kokotd\}@mcmaster.ca} }
+
+%\author{
+%  \textbf{First Author\textsuperscript{1}},
+%  \textbf{Second Author\textsuperscript{1,2}},
+%  \textbf{Third T. Author\textsuperscript{1}},
+%  \textbf{Fourth Author\textsuperscript{1}},
+%\\
+%  \textbf{Fifth Author\textsuperscript{1,2}},
+%  \textbf{Sixth Author\textsuperscript{1}},
+%  \textbf{Seventh Author\textsuperscript{1}},
+%  \textbf{Eighth Author \textsuperscript{1,2,3,4}},
+%\\
+%  \textbf{Ninth Author\textsuperscript{1}},
+%  \textbf{Tenth Author\textsuperscript{1}},
+%  \textbf{Eleventh E. Author\textsuperscript{1,2,3,4,5}},
+%  \textbf{Twelfth Author\textsuperscript{1}},
+%\\
+%  \textbf{Thirteenth Author\textsuperscript{3}},
+%  \textbf{Fourteenth F. Author\textsuperscript{2,4}},
+%  \textbf{Fifteenth Author\textsuperscript{1}},
+%  \textbf{Sixteenth Author\textsuperscript{1}},
+%\\
+%  \textbf{Seventeenth S. Author\textsuperscript{4,5}},
+%  \textbf{Eighteenth Author\textsuperscript{3,4}},
+%  \textbf{Nineteenth N. Author\textsuperscript{2,5}},
+%  \textbf{Twentieth Author\textsuperscript{1}}
+%\\
+%\\
+%  \textsuperscript{1}Affiliation 1,
+%  \textsuperscript{2}Affiliation 2,
+%  \textsuperscript{3}Affiliation 3,
+%  \textsuperscript{4}Affiliation 4,
+%  \textsuperscript{5}Affiliation 5
+%\\
+%  \small{
+%    \textbf{Correspondence:} \href{mailto:email@domain}{email@domain}
+%  }
+%}
+
+\begin{document}
+\maketitle
+% \begin{abstract}
+% \end{abstract}
+
+\section{Introduction}
+
+% Here, write a brief introduction to the problem you are solving. This can be adapted from your problem description and motivation from the original proposal. This should be around 0.25-0.5 pages.
+Pneumonia is a severe respiratory infection causing significant morbidity and mortality worldwide, especially in young children. Accurate and timely diagnosis is crucial for effective treatment and 
+improving outcomes. Traditionally, diagnosis relies on expert radiologists interpreting chest X-rays, but deep learning–based automated detection systems offer potential for faster and more scalable assessment that can support clinicians in high-volume or low-resource settings.
+
+In this project, we focus on pediatric chest X-ray images from a publicly available dataset, where each image is labeled as either Normal or Bacterial Pneumonia. Framing the problem as a binary classification task reflects a clinically meaningful distinction: separating healthy children from those with clear evidence of bacterial infection that may require urgent treatment. At the same time, working with pediatric data introduces challenges such as smaller dataset size, higher variability in anatomy and acquisition conditions, and the need for robust models that generalize beyond the training distribution.
+
+Our project aims to develop a convolutional neural network (CNN)–based model that distinguishes between normal and bacterial pneumonia pediatric chest X-ray images using transfer learning with pretrained weights. By starting from an ImageNet-pretrained ResNet18 backbone and carefully fine-tuning it on this medical domain, we aim to leverage powerful generic visual features while adapting them to lung-specific patterns such as consolidations and infiltrates. We complement this with strong data augmentation, class imbalance handling, and systematic evaluation against simple baselines to build a practical and interpretable pneumonia detection system.
+
+
+\section{Related Work}
+
+% Here, talk about the related work you encountered for your approach. Cite at least 5 references. Refer to item 2. No one has done exactly your task? Write about the most similar thing you can find. This should be around 0.25-0.5 pages.
+
+One of the most influential works in this area is CheXNet by Rajpurkar et al., who trained a 121-layer DenseNet on a much larger dataset "NIH ChestX-ray14 dataset" (over 100,000 adult radiographs with 14 labels) and showed that their model could detect pneumonia at or above average radiologist performance on a held-out test set (for certain pathologies). They later extended this approach to CheXNeXt, a multi-label model that jointly predicts multiple thoracic pathologies from a single chest X-ray (Rajpurkar, 2018). These works popularized the use of deep, CNNs on large CXR datasets. We drew insipiration from this paradigmin our own model.
+
+
+Previous work done on a similar task by (Kermany, 2018) has shown the effectiveness of both Convolutional Neural Networks and transfer learning in the domain medical image classification managing to achieve accuracies of >90\% on multi-label classification problems using Optical Coherence Tomography Images with Choroidal Neovascularization(CNV)/Drusen/Diabetic Macular Edema(DME); and Chest X-Rays with either Viral/Bacterial Pneumonia.  According to (Chouhan, 2020) transfer learning is a great tool for domains when only limited data is available, a major issue faced in using these models is that they are quite large compared to the dataset and when fine tuning deeper layers they can easily overfit to the training set. 
+
+
+A contrasting line of work to the transfer-learning paradigm uses classical machine learning on hand-crafted features rather than deep CNNs. (Nagashree and Mahanand, 2023) present a system for pneumonia chest X-ray classification using a Support Vector Machine (SVM), targeting the same type of task as ours: distinguishing pneumonia from normal cases in chest radiographs. Instead of learning features from scratch, they first extract Haar, shape, and texture descriptors from each X-ray and then train an SVM on these fixed feature vectors. Their study compares SVM performance against several other classifiers (decision trees, naive Bayes, k-nearest neighbours) and reports that SVM achieves the best overall accuracy for pneumonia detection. This pipeline is an example of a non–transfer-learning approach: all discriminative information comes from manually engineered features, and no pretrained deep network or ImageNet-style initialization is used.
+
+Another strand of work in medical image classification explicitly tries to go beyond the standard of transfer learning. (Hosny, 2025) proposed an attention-enhanced deep learning framework for multiclass gastrointestinal (GI) disease classification that they explicitly frame as “beyond transfer learning”. They argue that many existing GI pipelines rely on standard transfer learning with pretrained CNNs either as standalone classifiers, as components in ensembles, or as frozen feature extractors feeding shallow classifiers. They claim that these pipelines can be overly generic, computationally heavy, and perhaps not ideal for clinical settings. They propose a novel end-to-end DL model for multiclass GI disease classification called IRA-DenseNet201. They still start from a pretrained DenseNet201, but instead of just using a new layer on top, they wrap it in extra blocks (Inception, residual, attention, etc.). THese extra layers are designed specifically for GI disease images. In other words, they use transfer learning, but then customize and extend the backbone so the whole network is more specialized for their medical task. This is not directly related to our work as it is a different disease being classified but it does propose a valuable insight and potential strategy into how we can impove our work.
+
+\section{Dataset}
+
+% You should write about your dataset here, following the guidelines regarding item 1. This section may be 0.5-1 pages. Depending on your specific dataset, you may want to include subsections for the preprocessing, annotation, etc.
+
+We use the publicly available pediatric chest X-ray dataset sourced from Guangzhou Women and Children’s Medical Center. This dataset contains over 5,800 frontal chest X-ray images of pediatric patients aged between 1 and 5 years. Images are categorized as Normal, Viral Pneumonia, or Bacterial Pneumonia. For our project, we focus on distinguishing Normal images from those showing Bacterial Pneumonia, making it a binary classification task aligned with clinical priorities.
+
+The dataset we received has already undergone thorough quality control and was expertly annotated by radiologists before release. Poor-quality scans or unreadable images were excluded, and all images bear reliable labels confirmed by multiple reviewers. This ensures that the dataset is well-suited for training without requiring additional manual cleanup from our side.
+
+The data is split into training, validation, and test sets, comprising 80\%, 10\%, and 10\% of the dataset respectively. Stratified sampling maintains equal class distribution proportions across splits to prevent skewed training or evaluation.
+
+Each image is resized to a fixed \(160 \times 160\) pixel resolution. This size was chosen to balance model input requirements, computational efficiency, and sufficient preservation of pulmonary detail crucial for diagnosis. Pixel intensities are normalized using ImageNet channel mean and standard deviation statistics, a standard practice that promotes better convergence when fine-tuning pretrained convolutional neural networks.
+
+To increase training data diversity and reduce overfitting due to limited sample variety, we apply several augmentation techniques. These include random resized cropping to simulate scale variation, random horizontal flips to capture left-right anatomical invariance, slight random rotations to accommodate patient positioning variability, and brightness jittering to model differences in imaging conditions.
+
+Additionally, we introduced an optional histogram equalization step performed prior to other augmentations. This enhances the contrast of lung fields, potentially highlighting subtle features such as infiltrates or consolidations that aid model learning.
+
+
+Figure~\ref{fig:train-class-distribution} shows the class distribution in the training subset.
+\begin{figure}[h]
+    \centering
+    \includegraphics[width=0.8\linewidth]{DataDistribution.png}
+    \caption{Class distribution in the training set.}
+    \label{fig:train-class-distribution}
+\end{figure}
+Pneumonia cases are approximately three times more frequent than normal cases. To mitigate training bias from this class imbalance, we employ class weighting in the loss function, encouraging the model to learn balanced representations for both classes. The patients' have their personal information removed for the purposes of maintaining their privacy. The Operationalization of medical diagnoses is simple because the problem is very objective and requires the use of Experts to do the labeling. 
+
+
+Together, these dataset preparation strategies provide a solid and clinically relevant foundation for building an automated pediatric pneumonia diagnosis system.
+
+
+
+\section{Features}
+
+% Describe any features you used for your model, or how your data was input to your model. Are you doing feature engineering or feature selection? Are you learning embeddings? Is it all part of one neural network? Refer to item 2. This may range from 0.25 pages to 0.5 pages.
+
+Our model processes the input chest X-ray images by first applying augmentations and normalization to prepare the data for training. The images are originally grayscale but are converted into three-channel format to be compatible with the pretrained ResNet18 model we use. 
+The network learns features automatically through fine-tuning the pretrained model. This means the model adjusts both low-level and higher-level layers to better capture patterns specific to pneumonia detection. We do not perform any manual feature engineering beyond the 
+applied data augmentations. The representations are learned end-to-end, enabling the model to identify relevant structures and textures within the X-ray images that distinguish normal lungs from bacterial pneumonia.
+
+% \section{Implementation}
+
+% Describe your model and implementation here. Refer to item 4. This may take around a page.
+
+
+% The model uses a ResNet18 convolutional neural network pretrained on ImageNet. Initially, we freeze all pretrained layers except the final fully connected layer, which is replaced to suit our binary pneumonia classification task. In this stage, only the classification head is trained, enabling the network to learn the mapping from extracted features to target labels while keeping the general feature extractor unchanged.
+% Once the classification head achieves satisfactory performance, we unfreeze the last convolutional block to fine-tune deeper layers. This process allows the network to adapt more task-specific features relevant to pediatric chest X-rays and pneumonia detection. We apply a reduced learning rate during fine-tuning to stabilize training and preserve useful pretrained representations.
+
+% To address class imbalance in the dataset, we use a weighted cross-entropy loss, formulated as:
+
+% \begin{equation}
+% \mathcal{L} = - \sum_{i=1}^N w_{y_i} \log p(y_i \mid \mathbf{x}_i)
+% \label{eq:weighted_cross_entropy}
+% \end{equation}
+
+% Here, \(N\) is the number of samples, \(y_i\) is the true label of sample \(i\), \(w_{y_i}\) is the corresponding class weight compensating for imbalance, and \(p(y_i \mid \mathbf{x}_i)\) is the predicted probability for the correct class given input \(\mathbf{x}_i\).
+
+% Training is performed using the Adam optimizer with weight decay to regularize model parameters and reduce overfitting. We utilize early stopping based on the validation F1-score to halt training when improvements plateau, ensuring the preservation of the best model weights.
+% For baseline comparison, a simple majority-class classifier is implemented, which always predicts the most frequent class in the training set. This baseline sets a minimal performance bar that our trained model is expected to exceed.
+% Data augmentation and preprocessing during training contribute to model robustness. Challenges encountered include tuning when to freeze or unfreeze layers and selecting appropriate learning rates, addressed through iterative experimentation guided by validation metrics.
+
+% The modular design of the implementation facilitates easy extension with alternative models, loss functions, or augmentation methods in future work. Overall, this transfer learning approach provides a strong framework for pediatric pneumonia classification with promising initial results.
+
+
+\section{Implementation}
+
+% Describe your model and implementation here. Refer to item 4. This may take around a page.
+
+
+The model uses a ResNet18 convolutional neural network pretrained on ImageNet, adapted for binary classification of pediatric chest X-rays into Normal and Bacterial Pneumonia categories. We preprocess images by resizing to 224$\times$224 pixels (increased from the previous size of 160$\times$160 to match ResNet's standard input), converting grayscale to three-channel RGB by repeating channels, and normalizing with ImageNet mean (0.485, 0.456, 0.406) and standard deviation (0.229, 0.224, 0.225) values. This normalization subtracts the channel-wise mean and divides by the standard deviation from the ImageNet training distribution, ensuring the pretrained ResNet18 receives inputs with the same statistical properties it expects, which stabilizes training and preserves the value of pretrained weights even on grayscale medical images.
+
+
+Initially, we freeze all pretrained layers except the final fully connected layer, which is replaced to suit our binary pneumonia classification task . In this stage (Phase A), only the classification head is trained using Adam optimizer (initial lr=1e-3, weight decay=1e-4), enabling the network to learn the mapping from extracted features to target labels while keeping the general feature extractor unchanged and preserving low-level ImageNet features like edges and textures.
+
+To address class imbalance in the dataset (3:1 pneumonia:normal), we use a weighted cross-entropy loss including label smoothing (0.05), formulated as:
+
+\begin{equation}
+\mathcal{L} = - \sum_{i=1}^N w_{y_i} \log p(y_i \mid \mathbf{x}_i)
+\label{eq:weighted_cross_entropy}
+\end{equation}
+
+Here, \(N\) is the number of samples, \(y_i\) is the true label of sample \(i\), \(w_{y_i}\) is the corresponding class weight compensating for imbalance, and \(p(y_i \mid \mathbf{x}_i)\) is the predicted probability for the correct class given input \(\mathbf{x}_i\).
+
+Phase A applies extensive data augmentations, including random resized crops (scale 0.8--1.0), 
+horizontal flips ($p=0.5$), rotations ($\pm 10^\circ$), color jitter 
+(brightness/contrast/saturation/hue up to 0.2), and Gaussian noise ($\sigma=0.01$), 
+doubling augmentation variety from our previous milestone to combat overfitting 
+on approximately $5{,}000$ pediatric samples. 
+
+Training uses a \texttt{ReduceLROnPlateau} scheduler that halves the learning rate 
+after 5 epochs of no validation loss improvement (patience=5, factor=0.5, 
+min\_lr $= 10^{-6}$), with early stopping based on the validation F1-score 
+(patience=10) to halt training when improvements plateau, ensuring the preservation 
+of the best model weights. 
+
+Mixed-precision training provides 1.5--2$\times$ speedup and reduces memory usage. 
+Phase A achieved best validation F1 = 0.89.
+
+
+
+Once the classification head achieves satisfactory performance, we unfreeze the last convolutional block (Phase B: layers 3-5 of ResNet-18's four blocks, ~20\% of parameters) to fine-tune deeper layers at reduced lr=1e-4 for up to 50 epochs. This process allows the network to adapt more task-specific features relevant to pediatric chest X-rays and pneumonia detection, while preserving useful pretrained representations. We apply a reduced learning rate during fine-tuning to stabilize training. Phase B pushed validation F1 to 0.95.
+
+Training is performed using the Adam optimizer with weight decay to regularize model parameters 
+and reduce overfitting. Our modular \texttt{run\_epoch()} function handles both phases uniformly: 
+training/evaluation modes, automatic gradient accumulation/scaling, and batch-wise metric tracking 
+(accuracy, precision, recall, F1, ROC-AUC, and confusion matrices). Best models are automatically 
+saved when the validation F1 improves.
+
+
+For baseline comparison, a simple majority-class classifier is implemented, which always predicts the most frequent class in the training set. This baseline sets a minimal performance bar that our trained model is expected to exceed.
+Data augmentation and preprocessing improved robustness, alongside stratified sampling for balanced batches, dynamic class-weight updates, and automated generation of loss/F1 plots and labeled confusion matrices. Hyperparameter tuning explored learning rates from 1e-3 to 1e-5, batch sizes of 16–64, and dropout rates of 0–0.5, guided by validation F1. Challenges encountered include tuning when to freeze or unfreeze layers, selecting appropriate learning rates, and optimizing the threshold rate, which were addressed through iterative experimentation guided by validation metrics.
+
+The modular design of the implementation facilitates easy extension with alternative models, loss functions, or augmentation methods in future work. Overall, this enhanced transfer learning approach provides a strong framework for pediatric pneumonia
+classification, boosting validation F1 from 0.89 (Phase A) to 0.95 (Phase B), directly addressing TA feedback on baselines and systematic evaluation.
+
+
+
+\section{Results and Evaluation}
+
+% How are you evaluating your model? What results do you have so far? What are your baselines? Refer to item 5. This may take around 0.5 pages.
+
+We evaluate our model using stratified training, validation, and test splits.The validation set is used for hyperparameter tuning and early stopping, while the test set provides an unbiased estimate of final model performance.
+
+Our evaluation metrics include accuracy, precision, recall, F1-score, and ROC-AUC. Accuracy measures the overall correct predictions; precision and recall focus on positive (pneumonia) detection performance, which is critical in a medical context to minimize missed diagnoses. 
+The F1-score balances precision and recall, and the ROC-AUC quantifies the model’s discrimination ability across thresholds.
+
+The baseline model used for comparison is a majority-class classifier that predicts the most frequent class in the training data.
+
+We also compare against a majority-class baseline and visualize performance using a confusion matrix. The CNN substantially outperforms the baseline across all metrics, with F1-score improving from ~0.55 to >0.85 and recall notably higher, indicating fewer missed pneumonia cases.
+
+We plan to incorporate k-fold cross-validation in future work for more robust performance estimates.
+\begin{figure}[h]
+    \centering
+    \includegraphics[width=0.7\linewidth]{ConfusionMatrix.png}
+    \caption{Confusion matrix showing model performance on the test set.}
+    \label{fig:confusion-matrix}
+\end{figure}
+
+
+Specifically, the validation F1-score improved from approximately 0.55 (baseline) to over 0.85 with the CNN. Recall increased notably, signaling fewer missed pneumonia cases. 
+Confusion matrices further confirm enhanced true positive detection while controlling false positives.
+These preliminary results demonstrate that fine-tuning the pretrained ResNet18 with our preprocessing and augmentation pipeline yields a robust pneumonia classifier with strong generalization to unseen data.
+Future milestones include implementing k-fold cross-validation for more reliable estimates and further interpreting misclassification patterns to refine the model.
+
+
+
+
+% Write about your plans for the remainder of the project. This should include a discussion of the feedback you received from your TA, and how you plan to improve your approach. Reflect on your implementation and areas for improvement. Refer to item 6. This may be around 0.5 pages.
+
+\section{TA Feedback and Reflection}
+The primary feedback from our TA emphasized the importance of using a simple baseline for comparison, specifically the majority-class classifier. This baseline predicts the most frequent class in the training data and establishes a clear performance threshold that the CNN model should surpass. Including such a baseline is essential for contextualizing model results and avoiding overstated performance claims.
+
+Reflecting on this advice, we integrated the majority baseline into our evaluation framework and confirmed that our CNN model consistently outperforms it across key metrics. This strengthens confidence in the effectiveness of our transfer learning approach for pneumonia detection.
+
+The TA also recommended focusing on binary classification between Normal and Bacterial Pneumonia instead of including Viral Pneumonia. This simplifies the task and keeps the project scope focused. All data preparation and model design follow this two-class goal, with the majority baseline serving as a clear reference point. A multiclass version may be explored later as an extension to this project.
+
+In addition, the TA, mentioned that we could attempt to use multiple models (ie in a strategy similar to transfer learning), to use CNN features with an SVM which is a useful consideration we can make as we move forward
+
+Overall, the TA’s guidance reinforced the importance of rigorous benchmarking and comparative evaluation, which will remain central to our approach in future milestones.The guidance also helps us view transfer learning as simply one component of a larger paradigm. Based on the TA's feedback we will continue to experiment with different methods and small tweaks. Transfer learning is just one small part of our pipeline, and we are planning on exploring additional ways of differentiating our model as well.
+
+One area where we faced issues was with training on our local machine and subsequently had to switch to cloud. This was an reminder that going forward we may need to consider model complexity and training time, at least to some extent.
+
+Our implementation so far has highlighted several areas for improvement. First, the initial ResNet-18 transfer-learning model (with only the final layer trained) shows signs of overfitting, with training loss decreasing while validation loss and F1 sometimes degrade. This indicates that for the remaining weeks we need to experiment more with stronger regularization, data augmentation, and hyperparameter tuning.
+
+We plan on extending our model both with and without transfer learning (using pre-trained weights). We will continue to experiment with transfer learning by adding a tuning phase where the last ResNet block is unfrozen and trained with a small learning rate, to attempt a deeper adaptation to our data. As previously mentioned, based on feedback we may also introduced our own models for learning features or introduce new models that make use of the wights learned by our existing model.
+
+Since transfer learning relies on the pretrained weights of a generalized model they will always underperform compared to Specialized models that have been trained on a large dataset. Further next steps will be to investigate other Image classifying networks such as basic CNNs to gauge whether or not our dataset is large enough to continue pursuing Transfer Learning and provide another baseline for our model evaluation. 
+
+
+
+% \section{Template Notes}
+
+% You can remove this section or comment it out, as it only contains instructions for how to use this template. You may use subsections in your document as you find appropriate.
+
+% \subsection{Tables and figures}
+
+% See Table~\ref{citation-guide} for an example of a table and its caption.
+% See Figure~\ref{fig:experiments} for an example of a figure and its caption.
+
+% \subsection{Citations}
+
+% \begin{table*}
+%   \centering
+%   \begin{tabular}{lll}
+%     \hline
+%     \textbf{Output}           & \textbf{natbib command} & \textbf{ACL only command} \\
+%     \hline
+%     \citep{Gusfield:97}       & \verb|\citep|           &                           \\
+%     \citealp{Gusfield:97}     & \verb|\citealp|         &                           \\
+%     \citet{Gusfield:97}       & \verb|\citet|           &                           \\
+%     \citeyearpar{Gusfield:97} & \verb|\citeyearpar|     &                           \\
+%     \citeposs{Gusfield:97}    &                         & \verb|\citeposs|          \\
+%     \hline
+%   \end{tabular}
+%   \caption{\label{citation-guide}
+%     Citation commands supported by the style file.
+%   }
+% \end{table*}
+
+% Table~\ref{citation-guide} shows the syntax supported by the style files.
+% We encourage you to use the natbib styles.
+% You can use the command \verb|\citet| (cite in text) to get ``author (year)'' citations, like this citation to a paper by \citet{Gusfield:97}.
+% You can use the command \verb|\citep| (cite in parentheses) to get ``(author, year)'' citations \citep{Gusfield:97}.
+% You can use the command \verb|\citealp| (alternative cite without parentheses) to get ``author, year'' citations, which is useful for using citations within parentheses (e.g. \citealp{Gusfield:97}).
+
+
+
+% \nocite{Ando2005,andrew2007scalable,rasooli-tetrault-2015}
+
+% Many websites where you can find academic papers also allow you to export a bib file for citation or bib formatted entry. Copy this into the \texttt{custom.bib} and you will be able to cite the paper in the \LaTeX{}. You can remove the example entries.
+
+% \subsection{Equations}
+
+% An example equation is shown below:
+% \begin{equation}
+%   \label{eq:example}
+%   A = \pi r^2
+% \end{equation}
+
+% Labels for equation numbers, sections, subsections, figures and tables
+% are all defined with the \verb|\label{label}| command and cross references
+% to them are made with the \verb|\ref{label}| command.
+% This an example cross-reference to Equation~\ref{eq:example}. You can also write equations inline, like this: $A=\pi r^2$.
+
+
+% \section*{Limitations}
+
+\section*{Team Contributions}
+
+% Write in this section a few sentences describing the contributions of each team member. What did each member work on? Refer to item 7.
+Luna enhanced the pipeline into a robust two-phase fine-tuning system with stronger augmentations, smarter scheduling, selective unfreezing, and a cleaner, modular training loop. Andrew focused on model adaptation, training, and hyperparameter tuning. Djordje handled evaluation, baselines, and visualization. All contributed equally to report writing and refinement.
+% Bibliography entries for the entire Anthology, followed by custom entries
+%\bibliography{custom,anthology-overleaf-1,anthology-overleaf-2}
+
+% Custom bibliography entries only
+% \bibliography{custom}
+
+% \appendix
+
+% \section{Example Appendix}
+% \label{sec:appendix}
+
+% This is an appendix.
+
+\pagebreak
+\begin{thebibliography}{9}  % {9} sets label width; any small number is fine
+
+\bibitem[Rajpurkar(2018)]{Rajpurkar2018}
+Pranav Rajpurkar et al.
+\newblock Alternation.
+\newblock \emph{Journal of the Association for Computing Machinery}, 15(11):e1002686, 2018.
+\newblock doi:10.1371/journal.pmed.1002686.
+
+\bibitem[Kermany(2018)]{Kermany2018Dataset}
+Daniel Kermany et al.
+\newblock Large Dataset of Labeled Optical Coherence Tomography (OCT) and Chest X-Ray Images.
+\newblock \emph{Mendeley Data, V3}, 2018.
+\newblock doi:10.17632/rscbjbr9sj.3.
+\newblock Available at: \url{https://doi.org/10.17632/rscbjbr9sj.3}.
+
+\bibitem[Chouhan(2020)]{Chouhan2020}
+Vikash Chouhan et al.
+\newblock A Novel Transfer Learning Based Approach for Pneumonia Detection in Chest X-ray Images.
+\newblock \emph{Applied Sciences}, 10(2):559, 2020.
+\newblock doi:10.3390/app10020559.
+
+\bibitem[Kermany(2018)]{Kermany2018}
+Daniel S. Kermany et al.
+\newblock Identifying Medical Diagnoses and Treatable Diseases by Image-Based Deep Learning.
+\newblock \emph{Cell}, 172(5):1122--1131.e9, 2018.
+\newblock doi:10.1016/j.cell.2018.02.010.
+
+\bibitem[Nagashree and Mahanand(2023)]{NagashreeMahanand2023}
+Nagashree, S. and Mahanand, B.S.
+\newblock Pneumonia Chest X-ray Classification Using Support Vector Machine.
+\newblock In \emph{Proceedings of International Conference on Data Science and Applications},
+Lecture Notes in Networks and Systems, vol. 552, pp. 417--425. Springer, Singapore, 2023.
+\newblock doi:10.1007/978-981-19-6634-7\_29.
+
+\bibitem[Hosny(2025)]{Hosny2025}
+Hosny, M. et al.
+\newblock Beyond transfer learning: Attention-enhanced deep … 
+\newblock \emph{Expert Systems with Applications}, 2025. In press / online first.
+\newblock doi:10.1016/S0957-4174(25)024698.
+
+\end{thebibliography}
+
+
+\end{document}
