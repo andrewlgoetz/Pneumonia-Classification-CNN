@@ -115,6 +115,13 @@ Each image is resized to a fixed \(160 \times 160\) pixel resolution. This size 
 
 To increase training data diversity and reduce overfitting, we apply an extended augmentation pipeline. During training, each image undergoes a random resized crop (scale 0.8–1.0), random horizontal flip (p = 0.5), small random rotations (±10°), colour jitter (brightness/contrast/saturation/hue up to 0.2), and additive Gaussian noise ($\sigma$ approx. 0.01). These augmentations broaden the range of plausible acquisition conditions and patient positioning, encouraging the model to learn robust, invariant features rather than memorizing specific pixel patterns. Compared to the progress report, this richer augmentation set was introduced to support high-recall.
 
+\begin{figure}[h]
+    \centering
+    \includegraphics[width=1\linewidth]{Figures/Data-Aug-Example.png}
+    \caption{Data Augmentation in effect.}
+    \label{fig:data-aug}
+\end{figure}
+
 Additionally, we introduced an optional histogram equalization step performed prior to other augmentations. This enhances the contrast of lung fields, potentially highlighting subtle features such as infiltrates or consolidations that aid model learning.
 
 
