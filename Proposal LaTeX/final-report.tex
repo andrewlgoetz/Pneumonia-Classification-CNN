@@ -319,7 +319,57 @@ However, they treated the decision threshold as fixed at 0.5 and did not directl
 
 
 
+
+
+\section{Progress}
+We met all major commitments from the progress report while adapting based on TA feedback. In the previous milestone, the TA emphasized establishing a majority-class baseline and prioritizing recall due to the clinical risk of false negatives in disease detection.
+
+We implemented the majority-class baseline (test F1=$0.77$), which our model substantially outperforms (test F1=$0.95$). The original single-phase ResNet-18 achieved $98\%$ recall only at a $6\%$ threshold with poor precision. Following the TA's threshold-moving recommendation via precision-recall curves, we also improved the architecture with stronger regularization, expanded augmentations, Phase B fine-tuning (unfreezing layer4 at lr=$1 \times 10^{-4}$), and hyperparameter tuning. This achieved $98.2\%$ recall at $0.20$ threshold (F1=$0.94$).
+
+We also implemented the planned basic CNN baseline and ResNet features with SVM classification per TA guidance on multiple models. Both confirmed transfer learning's effectiveness for our dataset.
+
+Overall, we executed our technical roadmap while enhancing evaluation rigor through TA-recommended baselines and recall optimization.
+
+
+% Write about your plans for the remainder of the project. This should include a discussion of the feedback you received from your TA, and how you plan to improve your approach. Reflect on your implementation and areas for improvement. Refer to item 6. This may be around 0.5 pages.
+Additionally, we addressed initial ResNet-18 overfitting through stronger regularization, data augmentation, and hyperparameter tuning. We then fine-tuned the model by unfreezing the final convolutional block to better adapt to X-ray features. To broaden comparative analysis, we also tested a Basic CNN as a non–transfer-learning baseline and followed TA guidance by using the CNN as a feature extractor for traditional classifiers such as SVMs.
+
+
+\section{Error Analysis}
+In error analysis, we focused not just on how often the model is wrong, but how it is wrong and how that changes as we tune both the model and the decision threshold. We began by examining the test-set confusion matrix at the default 0.5 threshold, which already showed strong performance but an undesirable number of false negatives: 56 pneumonia cases misclassified as normal (recall approx.  0.86). 
+
+\begin{figure}[h]
+    \centering
+    \includegraphics[width=0.8\linewidth]{Figures/Test-CNN-CM.png}
+    \caption{Confusion matrix with 0.5 threshold.}
+    \label{fig:test-confusion-matrix}
+\end{figure}
+
+From there, we systematically swept over thresholds and plotted the precision–recall (PR) curve for the positive (pneumonia) class, treating each point on the curve as a different error profile. This allowed us to see, for each candidate threshold, how many pneumonia cases we would recover (recall) and how many false alarms we would generate (precision).
+
+Initially, with our earlier model and augmentation pipeline, achieving approx. 98\% recall (we acheived between 96 and 98 \% depending on randomness) required pushing the threshold down to about 0.06, which drove precision down to roughly 0.78. The corresponding confusion matrices and PR-curve position made it clear that this operating point produced an unacceptable number of false positives: the model would flag many normal images as pneumonia to catch nearly all pneumonia cases. Guided by these diagnostics, we revisited the implementation (as described in the previous section), strengthening data augmentation and adding a second fine-tuning phase to improve the underlying representation rather than simply “turning the threshold knob.”
+
+\begin{figure}[h]
+    \centering
+    \includegraphics[width=1.05\linewidth]{Figures/PR-Curve.png}
+    \caption{Precision-Recall curve for the CNN on the test set.}
+    \label{fig:pr-curve}
+\end{figure}
+
+After these changes, we re-ran the same PR-curve and threshold analysis. The curve shifted upward, and we found that a threshold of 0.20 now achieved approx. 96–98\% recall with approx. 0.93 precision and approx. 0.93 accuracy. The updated test confusion matrix at 0.20 (TN=206, FP=28, FN=15, TP=375)
+
+\begin{figure}[h]
+    \centering
+    \includegraphics[width=1\linewidth]{Figures/optimized-CNN-CM.png}
+    \caption{Final model with 0.2 threshold.}
+    \label{fig:optimized-confusion-matrix}
+\end{figure}
+
+shows that false negatives dropped dramatically compared to the 0.5-threshold model, while false positives increased only moderately. By comparing these confusion matrices and annotated PR curves before and after the model improvements, we systematically used visual and quantitative evidence about error patterns to select an operating point that aligns with the TA’s feedback: aggressively reducing false negatives while still maintaining clinically reasonable precision.
+
 %  Djorjde:
+
+Another way our team investigated systemically analyzed our errors was through the process of developing various models of similar architectures to help us understand which parts of the CNN / Transfer-Learning Architecture is driving performance of Pneumonia Detection. This helps us understand not only how our models performed but also how they struggled. The models we used to compare and evaluate were a: Majority Classifier baseline, a simple CNN baseline, a ResNet-50 Fine Tuned model, and our own ResNet-18 Model. We compare all the same metrics in our main model in \textbf{TABLE X}, those being: Accuracy, Precision, Recall, F1-Score, as well as plotting a Confusion Matrix. We further contextualize the results and conclusions we drew from our different model investigations with additional research into CNN articles, that helped us understand the variations in the different performance metrics. 
 
 Furthering upon our reflection from the progress report, we implemented a strong yet still relatively simpler CNN from scratch that didn’t implement any form of transfer learning. All convolutional layers used a kernel size of 3. The CNN baseline consisted of a 3-channel input to a Convolutional Layer of 10 computational units, passed to a ReLU activation then a 2x2 Max Pooling layer. Next, another convolutional layer that had 5 computational units followed by a ReLU activation, and then another convolutional layer with 16 computational units and a ReLU activation, followed by another 2x2 Max pooling layer. The classifying head following the max pooling layer comprised of a 21,904 input Fully connected layer with 128 outputs and a ReLU activation, a 64 output Fully connected layer followed by a ReLU, and lastly a Fully connected layer that produced a binary output corresponding to Pneumonia or Normal. We apply the same Data preprocessing and Augmentation as we do in our main model, so that we may attribute differences in performance to architecture and help us better understand the impact transfer learning has while minimizing the effect differences in input would produce. 
 
@@ -333,7 +383,7 @@ on the test set.}
     \label{fig:CNN}
 \end{figure}
 
-We further Investigated the use of Transfer Learning by implementing a similar model using transfer learning and ResNet-50 with weights that have been pretrained on the IMAGENET1K\_V1. Adapting the head for binary classification just as we did with out main ResNet-18 based model. This time the model also implemented the same optimization for the thresholds. This was purely for investigating the difference a higher capacity / deeper network would perform in comparison. The performance of this ResNet-50 model was surprising as the accuracy was 0.877, a precision of 0.964, a recall of 0.833, a F1-Score of 0.894, and a ROC-AUC score of 0.966. 
+We further Investigated the use of Transfer Learning by implementing a similar model using transfer learning and ResNet-50 with weights that have been pretrained on the IMAGENET1K\_V1. Adapting the head for binary classification just as we did with out main ResNet-18 based model. This time the model also implemented the same optimization for the thresholds. This was purely for investigating the difference a higher capacity / deeper network would perform in comparison. The performance of this ResNet-50 model was surprising as the accuracy was 0.877, a precision of 0.964, a recall of 0.833, a F1-Score of 0.894, and a ROC-AUC score of 0.966. This model had a higher recall, which can be seen in \textbf{FIGURE X} Confusion Matrix which shows that model fine tuning did still have some marginal gain for improving recall. 
 
 Figure~\ref{fig:CN_ResNet50} 
 \begin{figure}[h]
@@ -381,52 +431,6 @@ The model surprisingly happened to perform worse than our ResNet-18 model this w
 \caption{Mapping from model numbers to model names used in Table~\ref{tab:model_performance}.}
 \label{tab:model_name_mapping}
 \end{table}
-
-\section{Progress}
-We met all major commitments from the progress report while adapting based on TA feedback. In the previous milestone, the TA emphasized establishing a majority-class baseline and prioritizing recall due to the clinical risk of false negatives in disease detection.
-
-We implemented the majority-class baseline (test F1=$0.77$), which our model substantially outperforms (test F1=$0.95$). The original single-phase ResNet-18 achieved $98\%$ recall only at a $6\%$ threshold with poor precision. Following the TA's threshold-moving recommendation via precision-recall curves, we also improved the architecture with stronger regularization, expanded augmentations, Phase B fine-tuning (unfreezing layer4 at lr=$1 \times 10^{-4}$), and hyperparameter tuning. This achieved $98.2\%$ recall at $0.20$ threshold (F1=$0.94$).
-
-We also implemented the planned basic CNN baseline and ResNet features with SVM classification per TA guidance on multiple models. Both confirmed transfer learning's effectiveness for our dataset.
-
-Overall, we executed our technical roadmap while enhancing evaluation rigor through TA-recommended baselines and recall optimization.
-
-
-% Write about your plans for the remainder of the project. This should include a discussion of the feedback you received from your TA, and how you plan to improve your approach. Reflect on your implementation and areas for improvement. Refer to item 6. This may be around 0.5 pages.
-Additionally, we addressed initial ResNet-18 overfitting through stronger regularization, data augmentation, and hyperparameter tuning. We then fine-tuned the model by unfreezing the final convolutional block to better adapt to X-ray features. To broaden comparative analysis, we also tested a Basic CNN as a non–transfer-learning baseline and followed TA guidance by using the CNN as a feature extractor for traditional classifiers such as SVMs.
-
-
-\section{Error Analysis}
-In error analysis, we focused not just on how often the model is wrong, but how it is wrong and how that changes as we tune both the model and the decision threshold. We began by examining the test-set confusion matrix at the default 0.5 threshold, which already showed strong performance but an undesirable number of false negatives: 56 pneumonia cases misclassified as normal (recall approx.  0.86). 
-
-\begin{figure}[h]
-    \centering
-    \includegraphics[width=0.8\linewidth]{Figures/Test-CNN-CM.png}
-    \caption{Confusion matrix with 0.5 threshold.}
-    \label{fig:test-confusion-matrix}
-\end{figure}
-
-From there, we systematically swept over thresholds and plotted the precision–recall (PR) curve for the positive (pneumonia) class, treating each point on the curve as a different error profile. This allowed us to see, for each candidate threshold, how many pneumonia cases we would recover (recall) and how many false alarms we would generate (precision).
-
-Initially, with our earlier model and augmentation pipeline, achieving approx. 98\% recall (we acheived between 96 and 98 \% depending on randomness) required pushing the threshold down to about 0.06, which drove precision down to roughly 0.78. The corresponding confusion matrices and PR-curve position made it clear that this operating point produced an unacceptable number of false positives: the model would flag many normal images as pneumonia to catch nearly all pneumonia cases. Guided by these diagnostics, we revisited the implementation (as described in the previous section), strengthening data augmentation and adding a second fine-tuning phase to improve the underlying representation rather than simply “turning the threshold knob.”
-
-\begin{figure}[h]
-    \centering
-    \includegraphics[width=1.05\linewidth]{Figures/PR-Curve.png}
-    \caption{Precision-Recall curve for the CNN on the test set.}
-    \label{fig:pr-curve}
-\end{figure}
-
-After these changes, we re-ran the same PR-curve and threshold analysis. The curve shifted upward, and we found that a threshold of 0.20 now achieved approx. 96–98\% recall with approx. 0.93 precision and approx. 0.93 accuracy. The updated test confusion matrix at 0.20 (TN=206, FP=28, FN=15, TP=375)
-
-\begin{figure}[h]
-    \centering
-    \includegraphics[width=1\linewidth]{Figures/optimized-CNN-CM.png}
-    \caption{Final model with 0.2 threshold.}
-    \label{fig:optimized-confusion-matrix}
-\end{figure}
-
-shows that false negatives dropped dramatically compared to the 0.5-threshold model, while false positives increased only moderately. By comparing these confusion matrices and annotated PR curves before and after the model improvements, we systematically used visual and quantitative evidence about error patterns to select an operating point that aligns with the TA’s feedback: aggressively reducing false negatives while still maintaining clinically reasonable precision.
 
 
 % \section{Template Notes}
