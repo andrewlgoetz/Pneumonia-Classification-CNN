@@ -245,8 +245,11 @@ These preliminary results demonstrate that fine-tuning the pretrained ResNet18 w
 Future milestones include implementing k-fold cross-validation for more reliable estimates and further interpreting misclassification patterns to refine the model.
 
 
+\section{Progress}
 
+TA feedback shifted our evaluation priorities toward establishing a majority-class baseline and optimizing Recall (Sensitivity). Because False Negatives in disease detection carry high clinical risk, the TA recommended prioritizing true positives. We replaced the default 0.5 threshold and used the Precision–Recall Curve to tune the threshold. Lowering the cutoff increased recall; at a 0.20 threshold, the model reached 98% recall, meeting the TA’s target for safer screening.
 
+Additionally, we addressed initial ResNet-18 overfitting through stronger regularization, data augmentation, and hyperparameter tuning. We then fine-tuned the model by unfreezing the final convolutional block to better adapt to X-ray features. To broaden comparative analysis, we also tested a Basic CNN as a non–transfer-learning baseline and followed TA guidance by using the CNN as a feature extractor for traditional classifiers such as SVMs.
 % Write about your plans for the remainder of the project. This should include a discussion of the feedback you received from your TA, and how you plan to improve your approach. Reflect on your implementation and areas for improvement. Refer to item 6. This may be around 0.5 pages.
 
 \section{TA Feedback and Reflection}
