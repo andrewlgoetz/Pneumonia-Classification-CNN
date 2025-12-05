@@ -449,9 +449,16 @@ The model surprisingly happened to perform worse than our ResNet-18 model this w
 
 
 \subsection{Strengths and Weaknesses}
+From our experiments, the model is clearly good at detecting pneumonia and maintaining high sensitivity once we tune the threshold, but it still struggles with a subset of borderline or atypical normal cases.
 
+After error-driven tuning and stronger augmentation, lowering the threshold to 0.20 shifts the error profile: recall rises to approx. 0.96 with only 15 false negatives, while precision remains approx. 0.93 and accuracy approx. 0.93. This tells us the model is very good at picking up pneumonia-like patterns (infiltrates, consolidations, diffuse opacities) once we let it be more “sensitive,” and that many previously missed cases were near the decision boundary rather than fundamentally confusing to the network.
 
+The trade-off for optimizing for recall is that at 0.20 we see more false positives (28 vs 10 at 0.5). Comparing confusion matrices and PR curves across models, a pattern emerges: \\
+- \textbf{The simple CNN} has high recall but more false positives and slightly lower overall discrimination (lower ROC–AUC). \\
+- \textbf{ResNet-50} achieves strong ROC–AUC but lower recall, suggesting it overfits or attends to less clinically relevant cues. \\
+- \textbf{The final ResNet-18 with tuned threshold} gives the best balance: its remaining errors are mostly normals that are “pneumonia-like” in texture or imaging conditions, rather than clear-cut normals.
 
+If we were to continue, we would target these issues on several fronts. For false negatives, we could rebalance or reweight particularly hard pneumonia cases, or use curriculum learning / hard-example mining so the network repeatedly sees borderline positives. For false positives, we could design normal-focused augmentations (e.g., adding lines, devices, exposure changes) to teach the model that these artefacts do not imply disease. Manual feature engineering could also be explored: for example, adding simple lung-field segmentation masks, lung/heart shape descriptors, or handcrafted contrast/texture features as auxiliary inputs might help the model distinguish true parenchymal changes from global noise. More structurally, incorporating attention or localization mechanisms (e.g., supervision on lung regions) or pretraining on large chest-X-ray datasets could reduce reliance on spurious textures. Finally, k-fold cross-validation on the training data would give a more robust view of how stable these error patterns are across different splits, helping us distinguish genuine model weaknesses from artifacts of a single train/validation partition and guiding which error modes to prioritize in future iterations.
 % \section{Template Notes}
 
 % You can remove this section or comment it out, as it only contains instructions for how to use this template. You may use subsections in your document as you find appropriate.
