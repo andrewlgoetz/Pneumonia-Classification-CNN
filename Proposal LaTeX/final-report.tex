@@ -231,7 +231,7 @@ We evaluate our model using stratified training, validation, and test splits.The
 
 \subsection{Train/validation/test splits and label distributions}
 We use the training/test split provided by the chest X-ray dataset and derive a (stratified) validation set from the training portion via a 90/10 stratified split on the labels. 
-This yields 4,708 images for training, 524 for validation, and 624 for testing. To make the class balance explicit, we compute and plot label distributions for each split:
+This yields 4,708 images for training, 524 for validation, and 624 for testing. To make the class balance explicit, we compute and plot label distributions for each split (as also seen in Figure~\ref{fig:class-dist-confusion-matrix}):
 % \textbf{Train:} \\ 1,214 Normal (25.79\%), \\ 3,494 Pneumonia (74.21\%), total 4,708
 
 % \\
@@ -291,9 +291,27 @@ In response to our midterm evaluation to “optimize for Recall (Sensitivity)”
 
 Through iterative experiments with data augmentation and different thresholds and analysis of these figures, we found that a decision threshold of 0.20 provided an improved operating point on the PR curve. At this threshold, the test metrics are approximately:
 Accuracy: 0.931, Precision (Pneumonia): 0.931, F1: 0.946, ROC–AUC: 0.979, Recall (Pneumonia): 0.962.
-The Number of pneumonia cases missed went from 14.4\% to 3.8\%, a curcial improvement for the domain we are working in. For refenecen the majority baseline
+The Number of pneumonia cases missed went from 14.4\% to 3.8\%, a crucial improvement for the domain we are working in. For reference the majority baseline
 acheives a recall of 1.0 and a precision of 0.625.
 
+\begin{table}[h]
+\centering
+\scriptsize
+\setlength{\tabcolsep}{2.5pt}
+\begin{tabular}{lccc}
+\hline
+\textbf{Metric} & \textbf{Majority} & \textbf{CNN 0.5} & \textbf{CNN tuned} \\
+\hline
+Accuracy   & 0.625 & 0.896 & 0.933 \\
+Precision  & 0.625 & 0.971 & 0.931 \\
+Recall     & 1.000 & 0.859 & 0.964 \\
+F1         & 0.769 & 0.912 & 0.947 \\
+ROC-AUC    & 0.500 & 0.979 & 0.979 \\
+\hline
+\end{tabular}
+\caption{Performance comparison across models and thresholds.}
+\label{tab:test-metrics-compact}
+\end{table}
 
 
 In the progress report we already evaluated the model with stratified train/validation/test splits and the standard suite of metrics—accuracy, precision, recall, F1-score, ROC–AUC—and confusion matrices, comparing against a majority-class baseline. Those metrics were an adequate starting point and clearly showed that fine-tuning ResNet18 substantially improved F1 and recall over the baseline, indicating fewer missed pneumonia cases. 
@@ -385,7 +403,7 @@ In error analysis, we focused not just on how often the model is wrong, but how 
     \centering
     \includegraphics[width=0.8\linewidth]{Figures/Test-CNN-CM.png}
     \caption{Confusion matrix with 0.5 threshold.}
-    \label{fig:class-dist-confusion-matrix}
+    \label{fig:test-confusion-matrix}
 \end{figure}
 
 From there, we systematically swept over thresholds and plotted the precision–recall (PR) curve for the positive (pneumonia) class, treating each point on the curve as a different error profile. This allowed us to see, for each candidate threshold, how many pneumonia cases we would recover (recall) and how many false alarms we would generate (precision).
@@ -405,7 +423,7 @@ After these changes, we re-ran the same PR-curve and threshold analysis. The cur
     \centering
     \includegraphics[width=1\linewidth]{Figures/optimized-CNN-CM.png}
     \caption{Final model with 0.2 threshold.}
-    \label{fig:class-dist-confusion-matrix}
+    \label{fig:optimized-confusion-matrix}
 \end{figure}
 
 shows that false negatives dropped dramatically compared to the 0.5-threshold model, while false positives increased only moderately. By comparing these confusion matrices and annotated PR curves before and after the model improvements, we systematically used visual and quantitative evidence about error patterns to select an operating point that aligns with the TA’s feedback: aggressively reducing false negatives while still maintaining clinically reasonable precision.
