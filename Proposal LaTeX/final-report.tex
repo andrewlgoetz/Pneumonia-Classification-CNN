@@ -282,6 +282,23 @@ We plan on extending our model both with and without transfer learning (using pr
 
 Since transfer learning relies on the pretrained weights of a generalized model they will always underperform compared to Specialized models that have been trained on a large dataset. Further next steps will be to investigate other Image classifying networks such as basic CNNs to gauge whether or not our dataset is large enough to continue pursuing Transfer Learning and provide another baseline for our model evaluation. 
 
+\begin{table}[h]
+\centering
+\scriptsize % or \footnotesize, \scriptsize
+\begin{tabular}{lccccc}
+\hline
+\textbf{Model} & \textbf{Accuracy} & \textbf{Precision} & \textbf{Recall} & \textbf{F1-score} & \textbf{ROC\_AUC} \\
+\hline
+MAIN           & 0.9391 & 0.9607 & 0.9410 & 0.9508 & 0.9859 \\
+FINE-TUNED & 0.9215 & 0.9012 & 0.9821 & 0.9399 & 0.9859 \\
+MAJORITY                   & 0.6520 & 0.6250 & 1.0000 & 0.7692 & 0.5000 \\
+CNN                        & 0.8878 & 0.8738 & 0.9590 & 0.9144 & 0.9399 \\
+RESNET-50                  & 0.8766 & 0.9644 & 0.8333 & 0.8941 & 0.9667 \\
+\hline
+\end{tabular}
+\caption{Performance comparison of all evaluated models on the test set (values rounded to four decimal places).}
+\label{tab:model_performance}
+\end{table}
 
 
 % \section{Template Notes}
