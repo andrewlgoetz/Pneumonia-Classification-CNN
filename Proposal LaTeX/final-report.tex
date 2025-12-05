@@ -109,16 +109,16 @@ We use the publicly available pediatric chest X-ray dataset sourced from Guangzh
 
 The dataset we received has already undergone thorough quality control and was expertly annotated by radiologists before release. Poor-quality scans or unreadable images were excluded, and all images bear reliable labels confirmed by multiple reviewers. This ensures that the dataset is well-suited for training without requiring additional manual cleanup from our side.
 
-The data is split into training, validation, and test sets, comprising 80\%, 10\%, and 10\% of the dataset respectively. Stratified sampling maintains equal class distribution proportions across splits to prevent skewed training or evaluation.
+We use the original train/test split provided with the dataset and further create a stratified 90/10 split of the training set to obtain a validation set, preserving label proportions across train/validation/test.
 
 Each image is resized to a fixed \(160 \times 160\) pixel resolution. This size was chosen to balance model input requirements, computational efficiency, and sufficient preservation of pulmonary detail crucial for diagnosis. Pixel intensities are normalized using ImageNet channel mean and standard deviation statistics, a standard practice that promotes better convergence when fine-tuning pretrained convolutional neural networks.
 
-To increase training data diversity and reduce overfitting due to limited sample variety, we apply several augmentation techniques. These include random resized cropping to simulate scale variation, random horizontal flips to capture left-right anatomical invariance, slight random rotations to accommodate patient positioning variability, and brightness jittering to model differences in imaging conditions.
+To increase training data diversity and reduce overfitting, we apply an extended augmentation pipeline. During training, each image undergoes a random resized crop (scale 0.8–1.0), random horizontal flip (p = 0.5), small random rotations (±10°), colour jitter (brightness/contrast/saturation/hue up to 0.2), and additive Gaussian noise (σ ≈ 0.01). These augmentations broaden the range of plausible acquisition conditions and patient positioning, encouraging the model to learn robust, invariant features rather than memorizing specific pixel patterns. Compared to the progress report, this richer augmentation set was introduced to support high-recall.
 
 Additionally, we introduced an optional histogram equalization step performed prior to other augmentations. This enhances the contrast of lung fields, potentially highlighting subtle features such as infiltrates or consolidations that aid model learning.
 
 
-Figure~\ref{fig:class-dist-confusion-matrix} shows the class distribution in the training subset.
+Figure~\ref{fig:class-dist-confusion-matrix} shows the class distribution in the training subset. Exact distribution outlined in Table~\ref{fig:class-dist}.
 
 
 \begin{figure}[h]
@@ -140,8 +140,16 @@ Together, these dataset preparation strategies provide a solid and clinically re
 % Describe any features you used for your model, or how your data was input to your model. Are you doing feature engineering or feature selection? Are you learning embeddings? Is it all part of one neural network? Refer to item 2. This may range from 0.25 pages to 0.5 pages.
 
 Our model processes the input chest X-ray images by first applying augmentations and normalization to prepare the data for training. The images are originally grayscale but are converted into three-channel format to be compatible with the pretrained ResNet18 model we use. 
-The network learns features automatically through fine-tuning the pretrained model. This means the model adjusts both low-level and higher-level layers to better capture patterns specific to pneumonia detection. We do not perform any manual feature engineering beyond the 
+The network learns features automatically through fine-tuning the pretrained model. This means the model adjusts both low-level and higher-level layers to better capture patterns specific to pneumonia detection.
+
+We treat data augmentation as a form of feature-space enrichment encouraging the network to learn features that are invariant to positioning, brightness, and noise rather than memorizing specific pixel configurations.
+
+We do not perform any manual feature engineering beyond the 
 applied data augmentations. The representations are learned end-to-end, enabling the model to identify relevant structures and textures within the X-ray images that distinguish normal lungs from bacterial pneumonia.
+
+Across all experiments (simple CNN, ResNet-18, ResNet-50) used in developing our final model, we use the same raw pixel inputs and augmentations; the main difference in ‘features’ comes from the learned representations of each architecture rather than manual feature design. This method allowed us to attribute performance differences to the quality of learned features rather than changes in preprocessing.
+
+
 
 % \section{Implementation}
 
@@ -251,6 +259,7 @@ This yields 4,708 images for training, 524 for validation, and 624 for testing. 
         \hline
     \end{tabular}
     \caption{Class distribution (\%) across data splits.}
+    \label{fig:class-dist}
 \end{table}
 
 
@@ -345,6 +354,8 @@ In error analysis, we focused not just on how often the model is wrong, but how 
     \label{fig:test-confusion-matrix}
 \end{figure}
 
+\subsection{Threshold Tuning}
+
 From there, we systematically swept over thresholds and plotted the precision–recall (PR) curve for the positive (pneumonia) class, treating each point on the curve as a different error profile. This allowed us to see, for each candidate threshold, how many pneumonia cases we would recover (recall) and how many false alarms we would generate (precision).
 
 Initially, with our earlier model and augmentation pipeline, achieving approx. 98\% recall (we acheived between 96 and 98 \% depending on randomness) required pushing the threshold down to about 0.06, which drove precision down to roughly 0.78. The corresponding confusion matrices and PR-curve position made it clear that this operating point produced an unacceptable number of false positives: the model would flag many normal images as pneumonia to catch nearly all pneumonia cases. Guided by these diagnostics, we revisited the implementation (as described in the previous section), strengthening data augmentation and adding a second fine-tuning phase to improve the underlying representation rather than simply “turning the threshold knob.”
@@ -369,7 +380,10 @@ shows that false negatives dropped dramatically compared to the 0.5-threshold mo
 
 %  Djorjde:
 
+\subsection{Model Performance Analysis}
+
 Another way our team investigated systemically analyzed our errors was through the process of developing various models of similar architectures to help us understand which parts of the CNN / Transfer-Learning Architecture is driving performance of Pneumonia Detection. This helps us understand not only how our models performed but also how they struggled. The models we used to compare and evaluate were a: Majority Classifier baseline, a simple CNN baseline, a ResNet-50 Fine Tuned model, and our own ResNet-18 Model. We compare all the same metrics in our main model in \textbf{Table 3}, those being: Accuracy, Precision, Recall, F1-Score, as well as plotting a Confusion Matrix. We further contextualize the results and conclusions we drew from our different model investigations with additional research into CNN articles, that helped us understand the variations in the different performance metrics. 
+
 
 Furthering upon our reflection from the progress report, we implemented a strong yet still relatively simpler CNN from scratch that didn’t implement any form of transfer learning. All convolutional layers used a kernel size of 3. The CNN baseline consisted of a 3-channel input to a Convolutional Layer of 10 computational units, passed to a ReLU activation then a 2x2 Max Pooling layer. Next, another convolutional layer that had 5 computational units followed by a ReLU activation, and then another convolutional layer with 16 computational units and a ReLU activation, followed by another 2x2 Max pooling layer. The classifying head following the max pooling layer comprised of a 21,904 input Fully connected layer with 128 outputs and a ReLU activation, a 64 output Fully connected layer followed by a ReLU, and lastly a Fully connected layer that produced a binary output corresponding to Pneumonia or Normal. We apply the same Data preprocessing and Augmentation as we do in our main model, so that we may attribute differences in performance to architecture and help us better understand the impact transfer learning has while minimizing the effect differences in input would produce. 
 
@@ -431,6 +445,11 @@ The model surprisingly happened to perform worse than our ResNet-18 model this w
 \caption{Mapping from model numbers to model names used in Table~\ref{tab:model_performance}.}
 \label{tab:model_name_mapping}
 \end{table}
+
+
+
+\subsection{Strengths and Weaknesses}
+
 
 
 % \section{Template Notes}
