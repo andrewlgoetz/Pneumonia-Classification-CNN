@@ -217,66 +217,44 @@ classification, boosting validation F1 from 0.89 (Phase A) to 0.95 (Phase B), di
 
 
 
-\section{Evaluation}
-Our evaluation strategy is designed to (1) quantify generalization to unseen pediatric chest X-rays (test data), and (2) explicitly optimize and report high sensitivity (recall) for pneumonia, as emphasized in the TA feedback.
-The motivation for the latter is that in disease detection, a False Negative (telling a sick patient they are healthy) is much worse than a False Positive.
+\section{Results and Evaluation}
 
-\subsection{Train/validation/test splits and label distributions}
-We use the training/test split provided by the chest X-ray dataset and derive a (stratified) validation set from the training portion via a 90/10 stratified split on the labels. 
-This yields 4,708 images for training, 524 for validation, and 624 for testing. To make the class balance explicit, we compute and plot label distributions for each split:
- \\
-\textbf{Train:} \\ 1,214 Normal (25.79\%), \\ 3,494 Pneumonia (74.21\%), total 4,708
-\\
-\textbf{Validation:} \\ 135 Normal (25.76\%), \\ 389 Pneumonia (74.24\%), total 524
-\\
-\textbf{Test:} \\ 234 Normal (37.50\%),  \\ 390 Pneumonia (62.50\%), total 624
-\\ 
+% How are you evaluating your model? What results do you have so far? What are your baselines? Refer to item 5. This may take around 0.5 pages.
 
-All three splits remain skewed toward pneumonia, with the test set slightly more balanced making for a rigourous evaluation process. 
-These figures justify our use of a weighted cross-entropy loss during training.
-This is because the splits are clearly imbalanced toward pneumonia, a weighted loss is needed so the model does not
- simply favor the majority class and can learn to recognize the minority (normal) class effectively.
+We evaluate our model using stratified training, validation, and test splits.The validation set is used for hyperparameter tuning and early stopping, while the test set provides an unbiased estimate of final model performance.
 
-They also define a simple majority-class baseline for our use: a classifier that always predicts Pneumonia.
+Our evaluation metrics include accuracy, precision, recall, F1-score, and ROC-AUC. Accuracy measures the overall correct predictions; precision and recall focus on positive (pneumonia) detection performance, which is critical in a medical context to minimize missed diagnoses. 
+The F1-score balances precision and recall, and the ROC-AUC quantifies the model’s discrimination ability across thresholds.
 
-We do not employ k-fold cross-validation; instead, we use a single stratified train/validation
- split with early stopping and a strictly held-out test set. 
-Given the size of the dataset and the availability of a natural test partition, 
-this strategy lets us focus our computation on model refinement and threshold tuning for high recall,
- while still providing an unbiased estimate of generalization. In future work, k-fold cross-validation
-  on the training data could be added to better quantify variance in performance, but was not necessary for our main goal.
+The baseline model used for comparison is a majority-class classifier that predicts the most frequent class in the training data.
 
-\subsection{Evaluation Metrics}
+We also compare against a majority-class baseline and visualize performance using a confusion matrix. The CNN substantially outperforms the baseline across all metrics, with F1-score improving from ~0.55 to >0.85 and recall notably higher, indicating fewer missed pneumonia cases.
 
-At both validation and test time we compute a consistent set of metrics: accuracy, precision, recall (sensitivity),
- F1-score, ROC–AUC, and confusion matrices. For test-set analysis we additionally compute the precision–recall (PR) curve
-  and its area under the curve (PR–AUC), and we compare against the majority-class baseline. This Figures is valuable of understading
-  the threshold decision. Confusion matrices are printed numerically and visualized as labeled heatmaps, allowing us
-   to interpret pneumonia-class recall as sensitivity and normal-class recall as specificity.
-
-With the default probability threshold of 0.5 (the setting used in our progress report before recall-focused improvements), the final CNN on the test set achieves approximately:
-Accuracy: 0.894, Precision (Pneumonia): 0.971, F1: 0.910, ROC–AUC: 0.979, Recall (Pneumonia): 0.856. While precision is very high 14.4\% of pneumonie cases were missed.
-
-In response to our midterm evaluation to “optimize for Recall (Sensitivity)” and not rely on the default 0.5 threshold, we extended evaluation with the Precision-Recall curve and threshold moving. 
-Through iterative experiments with data augmentation and different thresholds and analysis of these figures, we found that a decision threshold of 0.20 provided an improved operating point on the PR curve. At this threshold, the test metrics are approximately:
-Accuracy: 0.931, Precision (Pneumonia): 0.931, F1: 0.946, ROC–AUC: 0.979, Recall (Pneumonia): 0.962.
-The Number of pneumonia cases missed went from 14.4\% to 3.8\%, a curcial improvement for the domain we are working in. For refenecen the majority baseline
-acheives a recall of 1.0 and a precision of 0.625.
+We plan to incorporate k-fold cross-validation in future work for more robust performance estimates.
+\begin{figure}[h]
+    \centering
+    \includegraphics[width=0.7\linewidth]{ConfusionMatrix.png}
+    \caption{Confusion matrix showing model performance on the test set.}
+    \label{fig:confusion-matrix}
+\end{figure}
 
 
-
-In the progress report we already evaluated the model with stratified train/validation/test splits and the standard suite of metrics—accuracy, precision, recall, F1-score, ROC–AUC—and confusion matrices, comparing against a majority-class baseline. Those metrics were an adequate starting point and clearly showed that fine-tuning ResNet18 substantially improved F1 and recall over the baseline, indicating fewer missed pneumonia cases. 
-However, they treated the decision threshold as fixed at 0.5 and did not directly address the importantce of maximizing sensitivity. In the final stage, we therefore kept the same core metrics and extended the evaluation with precision–recall curves, PR–AUC, and explicit threshold tuning and reporting, allowing us to reason about the recall–precision trade-off and choose an operating point (threshold 0.20) that achieves approximately >98\% recall while maintaining high precision and overall accuracy.
-
-
-
+Specifically, the validation F1-score improved from approximately 0.55 (baseline) to over 0.85 with the CNN. Recall increased notably, signaling fewer missed pneumonia cases. 
+Confusion matrices further confirm enhanced true positive detection while controlling false positives.
+These preliminary results demonstrate that fine-tuning the pretrained ResNet18 with our preprocessing and augmentation pipeline yields a robust pneumonia classifier with strong generalization to unseen data.
+Future milestones include implementing k-fold cross-validation for more reliable estimates and further interpreting misclassification patterns to refine the model.
 
 
 \section{Progress}
+We met all major commitments from the progress report while adapting based on TA feedback. In the previous milestone, the TA emphasized establishing a majority-class baseline and prioritizing recall due to the clinical risk of false negatives in disease detection.
 
-TA feedback shifted our evaluation priorities toward establishing a majority-class baseline and optimizing Recall (Sensitivity). Because False Negatives in disease detection carry high clinical risk, the TA recommended prioritizing true positives. We replaced the default 0.5 threshold and used the Precision–Recall Curve to tune the threshold. Lowering the cutoff increased recall; at a 0.20 threshold, the model reached 98% recall, meeting the TA’s target for safer screening.
+We implemented the majority-class baseline (test F1=$0.77$), which our model substantially outperforms (test F1=$0.95$). The original single-phase ResNet-18 achieved $98\%$ recall only at a $6\%$ threshold with poor precision. Following the TA's threshold-moving recommendation via precision-recall curves, we also improved the architecture with stronger regularization, expanded augmentations, Phase B fine-tuning (unfreezing layer4 at lr=$1 \times 10^{-4}$), and hyperparameter tuning. This achieved $98.2\%$ recall at $0.20$ threshold (F1=$0.94$).
 
-Additionally, we addressed initial ResNet-18 overfitting through stronger regularization, data augmentation, and hyperparameter tuning. We then fine-tuned the model by unfreezing the final convolutional block to better adapt to X-ray features. To broaden comparative analysis, we also tested a Basic CNN as a non–transfer-learning baseline and followed TA guidance by using the CNN as a feature extractor for traditional classifiers such as SVMs.
+We also implemented the planned basic CNN baseline and ResNet features with SVM classification per TA guidance on multiple models. Both confirmed transfer learning's effectiveness for our dataset.
+
+Overall, we executed our technical roadmap while enhancing evaluation rigor through TA-recommended baselines and recall optimization.
+
+
 % Write about your plans for the remainder of the project. This should include a discussion of the feedback you received from your TA, and how you plan to improve your approach. Reflect on your implementation and areas for improvement. Refer to item 6. This may be around 0.5 pages.
 
 \section{TA Feedback and Reflection}
