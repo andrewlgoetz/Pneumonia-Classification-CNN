@@ -118,13 +118,16 @@ To increase training data diversity and reduce overfitting due to limited sample
 Additionally, we introduced an optional histogram equalization step performed prior to other augmentations. This enhances the contrast of lung fields, potentially highlighting subtle features such as infiltrates or consolidations that aid model learning.
 
 
-Figure~\ref{fig:train-class-distribution} shows the class distribution in the training subset.
+Figure~\ref{fig:class-dist-confusion-matrix} shows the class distribution in the training subset.
+
+
 \begin{figure}[h]
-    \centering
-    \includegraphics[width=0.8\linewidth]{DataDistribution.png}
-    \caption{Class distribution in the training set.}
-    \label{fig:train-class-distribution}
+    \centering
+    \includegraphics[width=0.8\linewidth]{Figures/DataDistribution.png}
+    \caption{Class distribution in the training set.}
+    \label{fig:class-dist-confusion-matrix}
 \end{figure}
+
 Pneumonia cases are approximately three times more frequent than normal cases. To mitigate training bias from this class imbalance, we employ class weighting in the loss function, encouraging the model to learn balanced representations for both classes. The patients' have their personal information removed for the purposes of maintaining their privacy. The Operationalization of medical diagnoses is simple because the problem is very objective and requires the use of Experts to do the labeling. 
 
 
@@ -316,25 +319,40 @@ Overall, we executed our technical roadmap while enhancing evaluation rigor thro
 
 
 % Write about your plans for the remainder of the project. This should include a discussion of the feedback you received from your TA, and how you plan to improve your approach. Reflect on your implementation and areas for improvement. Refer to item 6. This may be around 0.5 pages.
+Additionally, we addressed initial ResNet-18 overfitting through stronger regularization, data augmentation, and hyperparameter tuning. We then fine-tuned the model by unfreezing the final convolutional block to better adapt to X-ray features. To broaden comparative analysis, we also tested a Basic CNN as a non–transfer-learning baseline and followed TA guidance by using the CNN as a feature extractor for traditional classifiers such as SVMs.
 
-\section{TA Feedback and Reflection}
-The primary feedback from our TA emphasized the importance of using a simple baseline for comparison, specifically the majority-class classifier. This baseline predicts the most frequent class in the training data and establishes a clear performance threshold that the CNN model should surpass. Including such a baseline is essential for contextualizing model results and avoiding overstated performance claims.
 
-Reflecting on this advice, we integrated the majority baseline into our evaluation framework and confirmed that our CNN model consistently outperforms it across key metrics. This strengthens confidence in the effectiveness of our transfer learning approach for pneumonia detection.
+\section{Error Analysis}
+In error analysis, we focused not just on how often the model is wrong, but how it is wrong and how that changes as we tune both the model and the decision threshold. We began by examining the test-set confusion matrix at the default 0.5 threshold, which already showed strong performance but an undesirable number of false negatives: 56 pneumonia cases misclassified as normal (recall approx.  0.86). 
 
-The TA also recommended focusing on binary classification between Normal and Bacterial Pneumonia instead of including Viral Pneumonia. This simplifies the task and keeps the project scope focused. All data preparation and model design follow this two-class goal, with the majority baseline serving as a clear reference point. A multiclass version may be explored later as an extension to this project.
+\begin{figure}[h]
+    \centering
+    \includegraphics[width=0.8\linewidth]{Figures/Test-CNN-CM.png}
+    \caption{Confusion matrix with 0.5 threshold.}
+    \label{fig:class-dist-confusion-matrix}
+\end{figure}
 
-In addition, the TA, mentioned that we could attempt to use multiple models (ie in a strategy similar to transfer learning), to use CNN features with an SVM which is a useful consideration we can make as we move forward
+From there, we systematically swept over thresholds and plotted the precision–recall (PR) curve for the positive (pneumonia) class, treating each point on the curve as a different error profile. This allowed us to see, for each candidate threshold, how many pneumonia cases we would recover (recall) and how many false alarms we would generate (precision).
 
-Overall, the TA’s guidance reinforced the importance of rigorous benchmarking and comparative evaluation, which will remain central to our approach in future milestones.The guidance also helps us view transfer learning as simply one component of a larger paradigm. Based on the TA's feedback we will continue to experiment with different methods and small tweaks. Transfer learning is just one small part of our pipeline, and we are planning on exploring additional ways of differentiating our model as well.
+Initially, with our earlier model and augmentation pipeline, achieving approx. 98\% recall (we acheived between 96 and 98 \% depending on randomness) required pushing the threshold down to about 0.06, which drove precision down to roughly 0.78. The corresponding confusion matrices and PR-curve position made it clear that this operating point produced an unacceptable number of false positives: the model would flag many normal images as pneumonia to catch nearly all pneumonia cases. Guided by these diagnostics, we revisited the implementation (as described in the previous section), strengthening data augmentation and adding a second fine-tuning phase to improve the underlying representation rather than simply “turning the threshold knob.”
 
-One area where we faced issues was with training on our local machine and subsequently had to switch to cloud. This was an reminder that going forward we may need to consider model complexity and training time, at least to some extent.
+\begin{figure}[h]
+    \centering
+    \includegraphics[width=1.05\linewidth]{Figures/PR-Curve.png}
+    \caption{Precision-Recall curve for the CNN on the test set.}
+    \label{fig:pr-curve}
+\end{figure}
 
-Our implementation so far has highlighted several areas for improvement. First, the initial ResNet-18 transfer-learning model (with only the final layer trained) shows signs of overfitting, with training loss decreasing while validation loss and F1 sometimes degrade. This indicates that for the remaining weeks we need to experiment more with stronger regularization, data augmentation, and hyperparameter tuning.
+After these changes, we re-ran the same PR-curve and threshold analysis. The curve shifted upward, and we found that a threshold of 0.20 now achieved approx. 96–98\% recall with approx. 0.93 precision and approx. 0.93 accuracy. The updated test confusion matrix at 0.20 (TN=206, FP=28, FN=15, TP=375)
 
-We plan on extending our model both with and without transfer learning (using pre-trained weights). We will continue to experiment with transfer learning by adding a tuning phase where the last ResNet block is unfrozen and trained with a small learning rate, to attempt a deeper adaptation to our data. As previously mentioned, based on feedback we may also introduced our own models for learning features or introduce new models that make use of the wights learned by our existing model.
+\begin{figure}[h]
+    \centering
+    \includegraphics[width=1\linewidth]{Figures/optimized-CNN-CM.png}
+    \caption{Final model with 0.2 threshold.}
+    \label{fig:class-dist-confusion-matrix}
+\end{figure}
 
-Since transfer learning relies on the pretrained weights of a generalized model they will always underperform compared to Specialized models that have been trained on a large dataset. Further next steps will be to investigate other Image classifying networks such as basic CNNs to gauge whether or not our dataset is large enough to continue pursuing Transfer Learning and provide another baseline for our model evaluation. 
+shows that false negatives dropped dramatically compared to the 0.5-threshold model, while false positives increased only moderately. By comparing these confusion matrices and annotated PR curves before and after the model improvements, we systematically used visual and quantitative evidence about error patterns to select an operating point that aligns with the TA’s feedback: aggressively reducing false negatives while still maintaining clinically reasonable precision.
 
 
 % \section{Template Notes}
@@ -394,7 +412,7 @@ Since transfer learning relies on the pretrained weights of a generalized model 
 
 % \section*{Limitations}
 
-\section*{Team Contributions}
+\section{Team Contributions}
 
 % Write in this section a few sentences describing the contributions of each team member. What did each member work on? Refer to item 7.
 Luna enhanced the pipeline into a robust two-phase fine-tuning system with stronger augmentations, smarter scheduling, selective unfreezing, and a cleaner, modular training loop. Andrew focused on model adaptation, training, and hyperparameter tuning. Djordje handled evaluation, baselines, and visualization. All contributed equally to report writing and refinement.
