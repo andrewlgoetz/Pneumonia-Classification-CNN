@@ -369,7 +369,7 @@ shows that false negatives dropped dramatically compared to the 0.5-threshold mo
 
 %  Djorjde:
 
-Another way our team investigated systemically analyzed our errors was through the process of developing various models of similar architectures to help us understand which parts of the CNN / Transfer-Learning Architecture is driving performance of Pneumonia Detection. This helps us understand not only how our models performed but also how they struggled. The models we used to compare and evaluate were a: Majority Classifier baseline, a simple CNN baseline, a ResNet-50 Fine Tuned model, and our own ResNet-18 Model. We compare all the same metrics in our main model in \textbf{TABLE X}, those being: Accuracy, Precision, Recall, F1-Score, as well as plotting a Confusion Matrix. We further contextualize the results and conclusions we drew from our different model investigations with additional research into CNN articles, that helped us understand the variations in the different performance metrics. 
+Another way our team investigated systemically analyzed our errors was through the process of developing various models of similar architectures to help us understand which parts of the CNN / Transfer-Learning Architecture is driving performance of Pneumonia Detection. This helps us understand not only how our models performed but also how they struggled. The models we used to compare and evaluate were a: Majority Classifier baseline, a simple CNN baseline, a ResNet-50 Fine Tuned model, and our own ResNet-18 Model. We compare all the same metrics in our main model in \textbf{Table 3}, those being: Accuracy, Precision, Recall, F1-Score, as well as plotting a Confusion Matrix. We further contextualize the results and conclusions we drew from our different model investigations with additional research into CNN articles, that helped us understand the variations in the different performance metrics. 
 
 Furthering upon our reflection from the progress report, we implemented a strong yet still relatively simpler CNN from scratch that didn’t implement any form of transfer learning. All convolutional layers used a kernel size of 3. The CNN baseline consisted of a 3-channel input to a Convolutional Layer of 10 computational units, passed to a ReLU activation then a 2x2 Max Pooling layer. Next, another convolutional layer that had 5 computational units followed by a ReLU activation, and then another convolutional layer with 16 computational units and a ReLU activation, followed by another 2x2 Max pooling layer. The classifying head following the max pooling layer comprised of a 21,904 input Fully connected layer with 128 outputs and a ReLU activation, a 64 output Fully connected layer followed by a ReLU, and lastly a Fully connected layer that produced a binary output corresponding to Pneumonia or Normal. We apply the same Data preprocessing and Augmentation as we do in our main model, so that we may attribute differences in performance to architecture and help us better understand the impact transfer learning has while minimizing the effect differences in input would produce. 
 
@@ -383,7 +383,7 @@ on the test set.}
     \label{fig:CNN}
 \end{figure}
 
-We further Investigated the use of Transfer Learning by implementing a similar model using transfer learning and ResNet-50 with weights that have been pretrained on the IMAGENET1K\_V1. Adapting the head for binary classification just as we did with out main ResNet-18 based model. This time the model also implemented the same optimization for the thresholds. This was purely for investigating the difference a higher capacity / deeper network would perform in comparison. The performance of this ResNet-50 model was surprising as the accuracy was 0.877, a precision of 0.964, a recall of 0.833, a F1-Score of 0.894, and a ROC-AUC score of 0.966. This model had a higher recall, which can be seen in \textbf{FIGURE X} Confusion Matrix which shows that model fine tuning did still have some marginal gain for improving recall. 
+We further Investigated the use of Transfer Learning by implementing a similar model using transfer learning and ResNet-50 with weights that have been pretrained on the IMAGENET1K\_V1. Adapting the head for binary classification just as we did with out main ResNet-18 based model. This time the model also implemented the same optimization for the thresholds. This was purely for investigating the difference a higher capacity / deeper network would perform in comparison. The performance of this ResNet-50 model was surprising as the accuracy was 0.877, a precision of 0.964, a recall of 0.833, a F1-Score of 0.894, and a ROC-AUC score of 0.966. This model had a higher recall, which can be seen in \textbf{Figure 7} Confusion Matrix which shows that model fine tuning did still have some marginal gain for improving recall. 
 
 Figure~\ref{fig:CN_ResNet50} 
 \begin{figure}[h]
@@ -394,7 +394,7 @@ on the test set.}
     \label{fig:CN_ResNet50}
 \end{figure}
 
-The model surprisingly happened to perform worse than our ResNet-18 model this was later explained upon further research and an article by (https://arxiv.org/abs/1902.07208) where they claim that the present standard of transfer learning from models pretrained on natural image datasets such as our ImageNet, transfer learning provides very miniscule benefits especially in medical imaging. They concluded that transfer learning image classifying models that used pretrained ImageNet weights only need the first two layers in most cases. They also explain how medical imaging datasets are vastly different compared to those like ImageNet where the subject of the image is in clear unobstructed view compared to X-rays where there’s constantly varying background and the area of interest is hidden in the variations of local textures. This article’s observations fully support our own prior results. Our simple CNN baseline managed to achieve a higher performance than our ResNet-50 model. From that investigation, we concluded that the pretrained image models and the features they are extracting are too generic, while only the lower-level layers are performing important feature extraction. Despite this we committed to the implementation of the shallower ResNet-18 model since our model fine-tuning seemed to work in our favor such that it surpassed the metrics of all our baselines. 
+The model surprisingly happened to perform worse than our ResNet-18 model this was later explained upon further research and an article by (Maithra Raghu et al) where they claim that the present standard of transfer learning from models pretrained on natural image datasets such as our ImageNet, transfer learning provides very miniscule benefits especially in medical imaging. They concluded that transfer learning image classifying models that used pretrained ImageNet weights only need the first two layers in most cases. They also explain how medical imaging datasets are vastly different compared to those like ImageNet where the subject of the image is in clear unobstructed view compared to X-rays where there’s constantly varying background and the area of interest is hidden in the variations of local textures. This article’s observations fully support our own prior results. Our simple CNN baseline managed to achieve a higher performance than our ResNet-50 model. From that investigation, we concluded that the pretrained image models and the features they are extracting are too generic, while only the lower-level layers are performing important feature extraction. Despite this we committed to the implementation of the shallower ResNet-18 model since our model fine-tuning seemed to work in our favor such that it surpassed the metrics of all our baselines. 
 
 \begin{table}[h]
 \centering
@@ -547,6 +547,18 @@ Hosny, M. et al.
 \newblock Beyond transfer learning: Attention-enhanced deep … 
 \newblock \emph{Expert Systems with Applications}, 2025. In press / online first.
 \newblock doi:10.1016/S0957-4174(25)024698.
+
+\bibitem[Raghu(2019)]{Raghu2019}
+Maithra Raghu et al.
+\newblock Transfusion: Understanding Transfer Learning for Medical Imaging.
+\newblock \emph{arXiv preprint} arXiv:1902.07208, 2019.
+\newblock doi:10.48550/arXiv.1902.07208.
+
+\bibitem[Simonyan and Zisserman(2014)]{SimonyanZisserman2014}
+Karen Simonyan and Andrew Zisserman.
+\newblock Very Deep Convolutional Networks for Large-Scale Image Recognition.
+\newblock \emph{arXiv preprint} arXiv:1409.1556, 2014.
+\newblock doi:10.48550/arXiv.1409.1556.
 
 \end{thebibliography}
 
